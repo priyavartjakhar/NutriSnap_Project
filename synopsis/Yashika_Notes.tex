@@ -1,0 +1,582 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage{times}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+\titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{}{0em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{}{0em}{}
+\setlength{\parindent}{0pt}
+\onehalfspacing
+
+\definecolor{green}{HTML}{1A6B4E}
+\definecolor{qbg}{HTML}{F0F7F4}
+\definecolor{qborder}{HTML}{1A6B4E}
+\definecolor{warnbg}{HTML}{FFF8E1}
+\definecolor{warnborder}{HTML}{E9A319}
+\definecolor{tipbg}{HTML}{EEF2FF}
+\definecolor{tipborder}{HTML}{2563EB}
+
+\newtcolorbox{qabox}{colback=qbg,colframe=qborder,boxrule=0.5pt,arc=4pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{warnbox}{colback=warnbg,colframe=warnborder,boxrule=0.5pt,arc=4pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+\newtcolorbox{tipbox}{colback=tipbg,colframe=tipborder,boxrule=0.5pt,arc=4pt,left=8pt,right=8pt,top=6pt,bottom=6pt}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\textcolor{green}{\textbf{NutriSnap}} -- Yashika's Notes}
+\fancyhead[R]{\small\thepage}
+\fancyfoot[C]{\small\textcolor{gray}{Food Calorie Estimation from Photographs | B.Tech CSE (IoT) 6th Sem}}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+% ════════════════════════════════════════════
+% COVER
+% ════════════════════════════════════════════
+
+\begin{center}
+{\LARGE \textbf{NutriSnap -- Your Cheat Sheet}}\\[0.4cm]
+{\large Everything You Need to Know for Tomorrow's Demo}\\[0.3cm]
+{\normalsize Yashika (231031150057) | Pushpa (231031150040) | Atharv (231031150013)}\\[0.15cm]
+{\normalsize Guide: Dr. Anu Yadav | Gurugram University}\\[0.5cm]
+\end{center}
+
+\begin{warnbox}
+\textbf{Read this entire document tonight.} It explains everything about our project in simple Hindi-English mix language. After reading this, you will be able to explain the project confidently to any teacher. The demo is super easy -- just follow the steps on page~\pageref{sec:demo}.
+\end{warnbox}
+
+\vspace{0.3cm}
+
+% ════════════════════════════════════════════
+\section{Sabse Pehle -- Project Kya Hai?}
+
+Humne ek \textbf{web application} banaya hai jiska naam hai \textbf{NutriSnap}.
+
+\textbf{Kya karta hai ye?}
+\begin{itemize}[leftmargin=1.2cm]
+\item Tu khane ki photo leti hai (ya upload karti hai)
+\item App bata deta hai ki ye kya khana hai (pizza, burger, sushi, etc.)
+\item Aur saath me batata hai ki isme kitni \textbf{calories, protein, fat, carbs, fiber} hai
+\item Bas itna. Simple hai. Photo do $\rightarrow$ Nutrition info lo.
+\end{itemize}
+
+\begin{tipbox}
+\textbf{One-line answer agar teacher puche ``What is your project?'':}\\[0.2cm]
+``Our project uses deep learning to identify food from photographs and estimate its nutritional content including calories, protein, fat, carbohydrates, and fiber.''
+\end{tipbox}
+
+% ════════════════════════════════════════════
+\section{Project Me Kitni Languages Use Hui Hain?}
+
+Yashika, ye project sirf Python me nahi hai. Multiple languages use hui hain, har ek ka alag kaam hai:
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Language} & \textbf{Kahan use hui} & \textbf{Kyun?} \\
+\midrule
+\textbf{Python} & AI model + server & AI/ML ke liye sabse popular language hai. Model training, image processing, server -- sab Python me hai \\
+\textbf{HTML} & Webpage structure & Browser me jo page dikhta hai uska skeleton HTML me bana hai \\
+\textbf{CSS} & Webpage design & Colors, fonts, spacing, animations -- sab CSS se aata hai \\
+\textbf{JavaScript} & Webpage logic & Button click karne pe kya ho, image upload, results show karna -- ye sab JS karta hai \\
+\textbf{Shell (Bash)} & Run script & \texttt{run.sh} file -- ek click me poora app start karne ke liye \\
+\bottomrule
+\end{tabularx}
+
+\vspace{0.3cm}
+
+\begin{tipbox}
+\textbf{Agar teacher puche ``What languages did you use?'':}\\[0.2cm]
+``Python for the AI model and backend server, HTML/CSS/JavaScript for the frontend web interface, and Bash for the deployment script.''
+\end{tipbox}
+
+% ════════════════════════════════════════════
+\section{Technologies Samjho -- Ek Ek Karke}
+
+\subsection{PyTorch -- AI Framework}
+Jaise construction ke liye cement, steel chahiye -- waise AI model banane ke liye ek \textbf{framework} chahiye. Humne \textbf{PyTorch} use kiya hai. Ye Google aur Facebook dono use karte hain. Isme hum neural network banate hain, train karte hain, aur predictions lete hain.
+
+\textbf{Agar teacher puche:} ``PyTorch is an open-source deep learning framework developed by Meta (Facebook). We used it to build and train our food classification model.''
+
+\subsection{EfficientNetV2-S -- Humara AI Model}
+Ye humara ``brain'' hai. \textbf{EfficientNetV2-S} ek pre-trained neural network hai jo Google ne banaya hai.
+
+\begin{itemize}[leftmargin=1.2cm]
+\item \textbf{EfficientNet} = Efficient (fast + accurate) Network
+\item \textbf{V2} = Version 2 (improved version)
+\item \textbf{S} = Small (chhota model, fast hai)
+\end{itemize}
+
+Ye pehle se 14 million images pe trained hai (ImageNet dataset). Toh isko edges, colors, shapes -- sab pehle se pata hai. Humne bas isko sikhaya ki ``ye pizza hai, ye burger hai, ye sushi hai.''
+
+\textbf{Agar teacher puche:} ``We used EfficientNetV2-S, a state-of-the-art convolutional neural network by Google. It uses compound scaling to balance accuracy and efficiency. The `S' stands for Small -- it's fast but still very accurate.''
+
+\subsection{Transfer Learning -- Shortcut Trick}
+Imagine tujhe cooking sikhni hai. Option A: zero se shuru karo (what is a knife? what is fire?). Option B: ek experienced chef ko hire karo aur bas apni recipes sikhao.
+
+Humne Option B kiya. Model ko pehle se lakho images dekhne ka experience hai (ImageNet). Humne bas uske upar food recognition sikha diya. Isko kehte hain \textbf{Transfer Learning}.
+
+\textbf{Two phases me train kiya:}
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{Phase 1 (Frozen):} Puraana knowledge lock kar diya. Sirf naya ``food classifier'' part train kiya. 5 epochs.
+\item \textbf{Phase 2 (Fine-tuning):} Top layers unlock kiye. Poora model slightly adjust kiya food images ke liye. 22 epochs (early stopping).
+\end{enumerate}
+
+\subsection{Food-101 Dataset}
+Ye humara training data hai. ETH Zurich (Switzerland ki top university) ne banaya hai.
+
+\begin{itemize}[leftmargin=1.2cm]
+\item \textbf{101,000 photos} of \textbf{101 food types}
+\item Har food ki 1,000 photos (750 training, 250 testing)
+\item Apple pie se lekar Waffles tak -- 101 categories
+\end{itemize}
+
+\textbf{Agar teacher puche:} ``We used the Food-101 benchmark dataset by ETH Zurich containing 101,000 images across 101 food categories. It's the standard dataset used in food recognition research.''
+
+\subsection{USDA FoodData Central -- Nutrition Database}
+Jab model bata deta hai ki ye ``pizza'' hai, toh calories kahan se aati hain?
+
+\textbf{USDA} = United States Department of Agriculture. Unki official database hai jisme har food ki nutritional info hai. Humne 101 foods ki nutrition info wahan se li hai -- calories, protein, fat, carbs, fiber.
+
+\subsection{Flask -- Web Server}
+Python ka ek lightweight web framework. Ye humara ``waiter'' hai:
+\begin{enumerate}[leftmargin=1.2cm]
+\item User photo upload karta hai
+\item Flask photo leke AI model ko deta hai
+\item Model batata hai ``ye pizza hai''
+\item Flask nutrition database se calories nikalta hai
+\item User ko result bhej deta hai
+\end{enumerate}
+
+\subsection{MPS (Metal Performance Shaders)}
+Apple ka GPU acceleration. NVIDIA ka CUDA hota hai, Apple ka MPS hota hai. Humne training MacBook ke M1 Max chip pe ki hai -- GPU pe fast train hota hai, CPU pe bohot slow hota.
+
+\subsection{Grad-CAM -- Heatmap (AI kahan dekh raha hai)}
+Ye sabse cool feature hai. Jab AI pizza identify karta hai, toh wo photo ke \textbf{kis part} ko dekh raha hai? Grad-CAM ye dikhata hai. Bright areas = jahan AI focus kar raha hai. Dark areas = ignore kar raha hai.
+
+\textbf{Agar teacher puche:} ``Grad-CAM stands for Gradient-weighted Class Activation Mapping. It visualizes which regions of the image the model focuses on to make its prediction. We hook into the last convolutional layer and compute a weighted activation map.''
+
+% ════════════════════════════════════════════
+\section{Model Performance -- Numbers Yaad Rakh}
+
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Metric} & \textbf{Value} \\
+\midrule
+Top-1 Accuracy & \textbf{80\%} (model ka \#1 guess correct hai 80\% baar) \\
+Top-5 Accuracy & \textbf{95\%} (correct answer top 5 guesses me hai 95\% baar) \\
+Best Validation Loss & 0.7283 \\
+Total Epochs & Phase 1: 5 + Phase 2: 22 = \textbf{27 epochs} \\
+Early Stopping & Patience 5 (agar 5 epochs me improve nahi hua toh ruk jao) \\
+Training Hardware & Apple M1 Max (24-core GPU, MPS backend) \\
+\bottomrule
+\end{tabularx}
+
+\begin{tipbox}
+\textbf{80\% accuracy ka matlab:} Agar tu 10 alag food photos degi, toh 8 baar model sahi batayega. Ye 101 categories ke liye bahut accha hai! State-of-the-art research papers me bhi \textasciitilde85-90\% rehta hai (but they use much bigger models).
+\end{tipbox}
+
+% ════════════════════════════════════════════
+\section{App Ke Features Samjho}
+
+Jab demo karegi, ye features dikhana:
+
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{Onboarding Screen} -- 3 steps: Welcome $\rightarrow$ Interest chips $\rightarrow$ Features showcase
+\item \textbf{Photo Upload} -- Drag-drop ya browse karke photo upload karo
+\item \textbf{Camera Capture} -- Live camera se photo le sakte ho
+\item \textbf{Nutrition Dashboard} -- 6 cards (Calories, Protein, Fat, Carbs, Fiber, Serving)
+\item \textbf{Top 3 Predictions} -- Model ke top 3 guesses with confidence \%
+\item \textbf{Heatmap (Grad-CAM)} -- ``Heatmap'' button click karo -- AI kahan dekh raha hai
+\item \textbf{Daily Intake Tracker} -- Din bhar me kitna khaya uska running total
+\item \textbf{Healthier Alternatives} -- Kam calorie wale food suggestions
+\item \textbf{Training Curves} -- ``Training Curves'' button -- model kaise train hua (graphs)
+\item \textbf{History} -- Pichli analysis yaad rehti hai bottom pe
+\end{enumerate}
+
+% ════════════════════════════════════════════
+\section{Demo Kaise Karna Hai}
+\label{sec:demo}
+
+\begin{warnbox}
+\textbf{IMPORTANT:} MacBook pe Terminal app kholo (Cmd + Space $\rightarrow$ type ``Terminal'' $\rightarrow$ Enter). Phir ye commands exactly type karo:
+\end{warnbox}
+
+\begin{verbatim}
+    cd ~/Documents/yashikawork/food_calorie_project/food-calorie-estimation
+    ./run.sh
+\end{verbatim}
+
+\textbf{Bas! Browser automatically khul jayega.} Agar nahi khule toh manually jaao: \texttt{http://localhost:8080}
+
+\subsection{Demo Flow (Teacher ke saamne)}
+
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{Onboarding dikhao} -- ``This is our app's onboarding experience'' (chips select karo, Continue karo)
+\item \textbf{Food photo upload karo} -- Apne phone se khane ki photo le lena already, AirDrop se Mac pe bhej dena, phir upload karo
+\item \textbf{Analyze click karo} -- 2-3 second me result aa jayega
+\item \textbf{Results dikhao} -- ``The model identified this as [food name] with [X]\% confidence''
+\item \textbf{Nutrition dikhao} -- ``Here are the nutritional values from the USDA database''
+\item \textbf{Heatmap dikhao} -- ``This heatmap shows where our AI model is focusing to make the prediction'' (click Heatmap button)
+\item \textbf{Training Curves dikhao} -- Nav bar me ``Training Curves'' click karo -- ``These are our actual training metrics -- you can see accuracy improving over 27 epochs''
+\item \textbf{Ek aur photo try karo} -- ``Back to App'' click karo, new photo upload karo -- shows it works on different foods
+\end{enumerate}
+
+\begin{tipbox}
+\textbf{Pro tip:} 2-3 food photos pehle se download karke Desktop pe rakh lena. Google se clear food photos le lena (pizza, sushi, burger etc.). Demo me fumble nahi hoga.
+\end{tipbox}
+
+% ════════════════════════════════════════════
+\section{File Structure -- Kaunsi File Kya Karti Hai}
+
+\begin{tabularx}{\textwidth}{l X}
+\toprule
+\textbf{File} & \textbf{Kya karti hai} \\
+\midrule
+\texttt{app.py} & Main server file. Model load karta hai, photos process karta hai, results bhejta hai \\
+\texttt{train.py} & Training script. Isse model ko train kiya tha (ab dobara run nahi karna) \\
+\texttt{src/model.py} & AI model ka architecture -- EfficientNetV2-S + custom classifier \\
+\texttt{src/dataset.py} & Food-101 dataset load karne ka code \\
+\texttt{src/nutrition.py} & 101 foods ki nutritional data (USDA se) -- Python dictionary me \\
+\texttt{templates/index.html} & Frontend -- jo browser me dikhta hai (HTML + CSS + JavaScript sab isme) \\
+\texttt{templates/training.html} & Training curves page (Chart.js graphs) \\
+\texttt{models/best\_model.pth} & Trained model file -- AI ka ``brain'' (80\% accuracy wala) \\
+\texttt{models/history.json} & Training history -- har epoch ka loss/accuracy data \\
+\texttt{run.sh} & One-click launcher -- ek command me sab start \\
+\texttt{requirements.txt} & Python packages ki list jo install karne hain \\
+\bottomrule
+\end{tabularx}
+
+% ════════════════════════════════════════════
+\section{Important Terms -- Ratta Maar Le}
+
+\begin{qabox}
+\textbf{Deep Learning} = AI ka ek type jisme ``neural networks'' use hote hain. Jaise brain me neurons hote hain, waise computer me artificial neurons. Ye patterns automatically seekhte hain data se.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{CNN (Convolutional Neural Network)} = Images ke liye special neural network. Ye image ke chhote-chhote parts pe filters lagata hai -- pehle edges dhundhta hai, phir textures, phir shapes, phir poora object (pizza, burger etc.)
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Epoch} = Ek baar poora training data model ko dikhana. Humne 27 epochs kiye (5 Phase 1 + 22 Phase 2). Jitne zyada epochs, utna zyada seekhta hai (ek limit tak).
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Overfitting} = Jab model ratta maare training data ka instead of actually samajhne ke. Jaise student jo answers yaad kare but concept na samjhe. Humne isse rokne ke liye Dropout + Data Augmentation + Early Stopping use kiya.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Dropout} = Training me randomly 30\% neurons off kar dete hain. Taaki model kisi ek neuron pe depend na kare. Exam me use nahi hota (prediction me off nahi karte).
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Data Augmentation} = Ek photo se bohot saari photos banana -- flip karo, rotate karo, crop karo, colors change karo. Isse model ko zyada training data milta hai without actually zyada photos liye.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Learning Rate} = Model kitni tezi se seekhta hai. Bohot fast = overshoot kare. Bohot slow = time waste. Phase 1: 0.001 (fast). Phase 2: 0.0001 (slow, fine adjustments).
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Cosine Annealing} = Learning rate ko dheere dheere kam karne ka method (cosine curve follow karta hai). Shuru me fast seekho, baad me slowly settle ho jao.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Early Stopping} = Agar 5 epochs tak improve na ho toh training rok do. Time bachata hai aur overfitting rokta hai.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{API Endpoint} = Ek URL jahan data bhejo aur response lo. Humara \texttt{/predict} endpoint photo leta hai aur food prediction bhejta hai. \texttt{/gradcam} heatmap bhejta hai.
+\end{qabox}
+
+% ════════════════════════════════════════════
+\section{Teacher Ke Possible Questions (Aur Jawab)}
+
+\begin{qabox}
+\textbf{Q: Project ka objective kya hai?}\\[0.15cm]
+A: To build a system that identifies food from photographs and estimates its nutritional content using deep learning. We use EfficientNetV2-S trained on Food-101 dataset and map predictions to USDA nutritional data.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: EfficientNet kyun use kiya? ResNet ya VGG kyun nahi?}\\[0.15cm]
+A: EfficientNetV2 gives better accuracy with fewer parameters. It uses compound scaling -- balances depth, width, and resolution. So it's both fast and accurate. ResNet is older and less efficient for the same accuracy level.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Transfer learning kya hai?}\\[0.15cm]
+A: Instead of training from scratch, we use a model already trained on 14 million ImageNet images. It already knows edges, textures, shapes. We just teach it food-specific patterns. It's like hiring an experienced person and teaching them your specific task.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Accuracy kitni hai?}\\[0.15cm]
+A: Top-1 accuracy is 80\% and Top-5 accuracy is 95\%. This means the correct food is our model's best guess 80\% of the time, and within the top 5 guesses 95\% of the time.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Two phase training kyun?}\\[0.15cm]
+A: Phase 1 trains only the classifier head (5 epochs) -- so the randomly initialized new layer doesn't corrupt the pre-trained features. Phase 2 unfreezes top layers for food-specific fine-tuning (22 epochs). This gives better accuracy than training everything at once.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Nutritional data kahan se aayi?}\\[0.15cm]
+A: USDA FoodData Central -- the official U.S. government nutrition database. We mapped all 101 food categories to their per-serving nutritional values.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Limitations kya hain?}\\[0.15cm]
+A: (1) Limited to 101 food categories. (2) Cannot estimate portion size from photo. (3) Mixed dishes are challenging. (4) Nutritional values are averages. (5) Photo quality affects accuracy.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Heatmap kya dikhata hai?}\\[0.15cm]
+A: It's Grad-CAM -- Gradient-weighted Class Activation Mapping. It shows which parts of the image the AI model focuses on to make its prediction. Bright areas are where the model pays most attention. This helps verify the model is looking at the food, not the background.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Web application kaise kaam karta hai?}\\[0.15cm]
+A: User uploads photo $\rightarrow$ Browser sends it to Flask server's /predict endpoint $\rightarrow$ Server preprocesses image (resize to 224$\times$224, normalize) $\rightarrow$ Feeds through EfficientNetV2-S $\rightarrow$ Gets probabilities for 101 classes $\rightarrow$ Takes top 3 $\rightarrow$ Looks up USDA nutrition data $\rightarrow$ Returns JSON $\rightarrow$ Frontend shows results.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Kya ye Indian food recognize karta hai?}\\[0.15cm]
+A: Food-101 has some Indian foods like samosa and some Asian foods. For foods not in the 101 categories, it predicts the closest match. Future work could include adding an Indian food dataset to expand coverage.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: CUDA aur MPS me kya fark hai?}\\[0.15cm]
+A: CUDA is NVIDIA's GPU computing platform, MPS is Apple's equivalent for M1/M2/M3 chips. Both accelerate training using GPU. We used MPS because we trained on an Apple M1 Max MacBook Pro.
+\end{qabox}
+\vspace{0.2cm}
+
+\begin{qabox}
+\textbf{Q: Overfitting kaise roka?}\\[0.15cm]
+A: Four techniques: (1) Dropout -- randomly disabling 30\% neurons during training, (2) Data augmentation -- random flips, rotations, crops, (3) Early stopping -- stop if no improvement for 5 epochs, (4) Transfer learning -- starting from a well-generalized pre-trained model.
+\end{qabox}
+
+% ════════════════════════════════════════════
+\section{Agar Kuch Galat Ho Jaye Demo Me}
+
+\begin{warnbox}
+\textbf{Problem: Terminal me error aaye}\\
+Solution: Terminal band karo, dobara kholo, phir commands run karo:
+\begin{verbatim}
+cd ~/Documents/yashikawork/food_calorie_project/food-calorie-estimation
+./run.sh
+\end{verbatim}
+\end{warnbox}
+
+\begin{warnbox}
+\textbf{Problem: Browser me ``Connection refused'' aaye}\\
+Solution: Server start hone me 5-6 seconds lagta hai. Wait karo, phir refresh (Cmd+R) karo.
+\end{warnbox}
+
+\begin{warnbox}
+\textbf{Problem: Port already in use error}\\
+Solution: Terminal me ye run karo phir dobara \texttt{./run.sh}:
+\begin{verbatim}
+lsof -ti:8080 | xargs kill -9
+\end{verbatim}
+\end{warnbox}
+
+\begin{warnbox}
+\textbf{Problem: Onboarding nahi dikh raha}\\
+Solution: Nav bar me ``Onboarding'' button click karo -- wapas aa jayega.
+\end{warnbox}
+
+\begin{warnbox}
+\textbf{Problem: Model slow lagta hai}\\
+Solution: Slow nahi hai, 2-3 seconds lagta hai. It's processing on M1 Max GPU. Ye normal hai.
+\end{warnbox}
+
+% ════════════════════════════════════════════
+\section{Raat Ko YouTube Pe Ye Dekh Le (Optional)}
+
+Agar time mile toh ye 10-15 min ke videos dekh lena, samajh aur badhegi:
+
+\begin{itemize}[leftmargin=1.2cm]
+\item ``What is a Neural Network?'' by 3Blue1Brown (best animated explanation)
+\item ``Transfer Learning explained in 5 minutes'' -- koi bhi video
+\item ``How does image classification work?'' -- koi bhi video
+\item ``EfficientNet explained simply'' -- samajh aayega compound scaling
+\end{itemize}
+
+% ════════════════════════════════════════════
+\section{Deep Dive -- Poora System Kaise Kaam Karta Hai}
+
+Agar teacher detailed pooche toh ye samajh le:
+
+\subsection{Step 1: Image Preprocessing}
+Jab tu photo upload karti hai, toh seedha model ko nahi dete. Pehle photo ko \textbf{prepare} karte hain:
+\begin{itemize}[leftmargin=1.2cm]
+\item Photo ko \textbf{224 $\times$ 224 pixels} me resize karte hain (model ko fixed size chahiye)
+\item Center se crop karte hain (taaki food center me rahe)
+\item Pixel values ko \textbf{normalize} karte hain -- matlab 0-255 range se 0-1 range me laate hain
+\item ImageNet ke mean aur std se adjust karte hain: mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+\end{itemize}
+
+\textbf{Kyun?} Kyunki model ImageNet pe trained hai, toh usko wahi format chahiye jaise usne pehle dekha tha. Agar different format doge toh confused ho jayega.
+
+\subsection{Step 2: Model Forward Pass}
+Preprocessed image model me jaata hai. Model ke andar:
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{Convolutional layers} -- image ke features nikalte hain (edges $\rightarrow$ textures $\rightarrow$ shapes $\rightarrow$ objects)
+\item \textbf{Pooling layers} -- features ko compress karte hain (important info rakhte, bakki hatate)
+\item \textbf{Dropout layer} (p=0.3) -- 30\% neurons randomly off (training me hi, prediction me nahi)
+\item \textbf{Fully Connected layer} -- 1,280 features ko 101 classes me map karta hai
+\item \textbf{Softmax} -- har class ko probability deta hai (sab milaake 100\%)
+\end{enumerate}
+
+Output: 101 numbers (probabilities). Sabse bada number = most likely food.
+
+\subsection{Step 3: Top-3 Predictions}
+Hum sirf \#1 guess nahi lete, \textbf{top 3} lete hain. Kyunki kabhi kabhi food similar dikhta hai (e.g., fried rice vs biryani). Top 3 dene se user ko options milte hain.
+
+Har prediction ke saath \textbf{confidence score} hota hai (percentage). Agar confidence 85\%+ hai toh green badge, 30-85\% toh amber, below 30\% toh gray.
+
+\subsection{Step 4: Nutrition Lookup}
+Top prediction ka naam leke hum \texttt{src/nutrition.py} file me jaate hain. Wahan 101 foods ki dictionary hai:
+\begin{verbatim}
+    "pizza": {
+        "calories": 285, "protein": 12, "fat": 12,
+        "carbs": 33, "fiber": 2, "serving_size": "1 slice (130g)"
+    }
+\end{verbatim}
+Ye sab data USDA ki official website se liya hai. Har food ke liye 6 values hain.
+
+\subsection{Step 5: Response to Browser}
+Server ye sab data JSON format me browser ko bhejta hai. JSON matlab structured data -- key-value pairs. Browser (JavaScript) ye data lekar dashboard me dikhata hai.
+
+% ════════════════════════════════════════════
+\section{Training Ka Poora Process}
+
+Ye section sirf samajhne ke liye hai. Training already ho chuki hai, demo me dobara nahi karni.
+
+\subsection{Phase 1: Frozen Backbone (5 Epochs)}
+\begin{itemize}[leftmargin=1.2cm]
+\item EfficientNetV2-S ka poora backbone \textbf{freeze} kar diya (weights change nahi honge)
+\item Sirf naya classifier head (Dropout + Linear layer) train kiya
+\item Learning rate: 0.001 (relatively fast)
+\item Optimizer: Adam (smart optimizer jo automatically adjust karta hai)
+\item Loss function: Cross-Entropy (multi-class classification ke liye standard)
+\item Result: 54\% accuracy (decent start for just training the head)
+\end{itemize}
+
+\textbf{Kyun freeze kiya?} Naya classifier randomly initialized hai. Agar saath me backbone bhi train kare toh naye classifier ke random gradients backbone ke achhe weights kharab kar denge. Pehle classifier ko stable hone do, phir backbone touch karo.
+
+\subsection{Phase 2: Fine-Tuning (22 Epochs, stopped at 22 out of max 25)}
+\begin{itemize}[leftmargin=1.2cm]
+\item Top 50 layers \textbf{unfreeze} kiye (backbone ke end ke layers)
+\item Learning rate: 0.0001 (10x slower -- careful adjustments)
+\item Cosine annealing scheduler -- LR gradually decrease hoti hai
+\item Early stopping patience: 5 (5 epochs me improve nahi hua toh rok do)
+\item Result: 54\% $\rightarrow$ \textbf{80\%} accuracy (massive jump!)
+\end{itemize}
+
+\textbf{Kyun sirf top 50 layers?} Bottom layers general features seekhti hain (edges, colors) -- ye sab foods ke liye same hain. Top layers specific features seekhti hain -- inko food-specific banana zaroori hai. Bottom layers ko change karne ki zaroorat nahi.
+
+\subsection{Training Hardware}
+\begin{itemize}[leftmargin=1.2cm]
+\item \textbf{Machine:} Apple MacBook Pro with M1 Max chip
+\item \textbf{GPU:} 24-core integrated GPU (MPS backend in PyTorch)
+\item \textbf{RAM:} Unified memory (CPU aur GPU same RAM share karte hain -- Apple ka special design)
+\item \textbf{Training time:} Approximately 4-5 hours total
+\item \textbf{Fan speed:} 2000 RPM (basically silent -- M1 Max bahut efficient hai)
+\end{itemize}
+
+% ════════════════════════════════════════════
+\section{Comparison with Other Approaches}
+
+Agar teacher puche ``why not other methods?'':
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Approach} & \textbf{Accuracy} & \textbf{Why we didn't use} \\
+\midrule
+VGG-16 & \textasciitilde70\% & Too many parameters (138M vs our 21M), slow \\
+ResNet-50 & \textasciitilde75\% & Good but less efficient than EfficientNet \\
+InceptionV3 & \textasciitilde76\% & Complex architecture, more compute needed \\
+\textbf{EfficientNetV2-S (ours)} & \textbf{\textasciitilde80\%} & Best accuracy-to-size ratio, fast training \\
+Vision Transformer & \textasciitilde85\% & Needs way more data and compute, overkill \\
+\bottomrule
+\end{tabularx}
+
+\begin{tipbox}
+\textbf{One-liner answer:} ``We chose EfficientNetV2-S because it achieves the best balance between accuracy and computational efficiency through compound scaling, making it ideal for deployment on edge devices like our MacBook.''
+\end{tipbox}
+
+% ════════════════════════════════════════════
+\section{Future Scope (Agar Teacher Puche)}
+
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{Indian food dataset add karna} -- Biryani, Dosa, Chole Bhature, Paneer Tikka etc.
+\item \textbf{Portion size estimation} -- depth camera se food ka volume estimate karna
+\item \textbf{Multi-food detection} -- ek plate me multiple items identify karna (YOLO/Faster R-CNN)
+\item \textbf{Mobile app} -- React Native ya Flutter me proper Android/iOS app
+\item \textbf{Calorie tracking with goals} -- weekly/monthly targets set karna
+\item \textbf{Barcode scanning} -- packaged food ka barcode scan karke nutrition dikhana
+\item \textbf{Real-time video feed} -- continuous camera feed se food detect karna
+\end{enumerate}
+
+% ════════════════════════════════════════════
+\section{Common Galtiyan Jo Demo Me Mat Karna}
+
+\begin{enumerate}[leftmargin=1.2cm]
+\item \textbf{``Humne sab Python me kiya hai''} -- GALAT. HTML, CSS, JavaScript bhi hai. Batana.
+\item \textbf{``Model 100\% accurate hai''} -- GALAT. 80\% hai. Honestly bolna ki 80\% hai with 95\% Top-5.
+\item \textbf{``Hum real-time me train karte hain''} -- GALAT. Training already ho chuki hai. App sirf prediction karta hai.
+\item \textbf{``Ye sabhi food recognize karta hai''} -- GALAT. Sirf 101 categories hain. Agar koi daal chawal ki photo de toh closest match ayega.
+\item \textbf{Nervous hoke fast fast bolna} -- Slow bol. Ek feature achhe se dikhao. Pause lo.
+\end{enumerate}
+
+% ════════════════════════════════════════════
+\section{Confidence Booster}
+
+\begin{itemize}[leftmargin=1.2cm]
+\item Tere paas \textbf{working demo} hai -- 90\% groups ke paas nahi hota
+\item Tere paas \textbf{80\% accuracy} hai -- research paper level result hai
+\item Tere paas \textbf{Grad-CAM heatmap} hai -- ye advanced feature hai, most B.Tech projects me nahi hota
+\item Tere paas \textbf{Training Curves} page hai -- proves tumne actually train kiya, mock nahi hai
+\item Tere paas \textbf{3-step onboarding} hai -- professional product jaisa feel hai
+\item Tere paas \textbf{Daily Intake Tracker} hai -- practical real-world feature
+\end{itemize}
+
+Teacher impressed hogi. Bas confidently present kar.
+
+\vspace{0.8cm}
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}\\[0.3cm]
+{\large \textbf{All the best for tomorrow, Yashika!}}\\[0.15cm]
+{\normalsize Tu ye kar sakti hai. Bas confidently bol, demo smooth karna, aur agar kuch nahi aata toh bol ``That's a great question, I'll look into it further.'' }\\[0.15cm]
+{\small \textcolor{gray}{-- Akhil}}
+\end{center}
+
+\end{document}

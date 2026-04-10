@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSnap</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #F8F8F6;
+            --surface: #FFFFFF;
+            --text: #0D0D0D;
+            --text-soft: #3D3D3D;
+            --text-muted: #8A8A8A;
+            --border: #E8E8E4;
+            --border-soft: #F0F0EC;
+            --accent: #1A6B4E;
+            --accent-light: #E8F5EE;
+            --accent-warm: #F4A261;
+            --accent-warm-light: #FEF3E2;
+            --blue: #2563EB;
+            --red: #E63946;
+            --green: #1A6B4E;
+            --amber: #E9A319;
+            --violet: #6C47EC;
+            --radius: 14px;
+            --radius-sm: 10px;
+        }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ═══════ ONBOARDING ═══════ */
+        .onboarding {
+            position: fixed; inset: 0; z-index: 200;
+            background: linear-gradient(145deg, #0D1F17 0%, #0A0F0D 50%, #121A16 100%);
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.7s cubic-bezier(0.4, 0, 0, 1), transform 0.7s cubic-bezier(0.4, 0, 0, 1);
+            overflow: hidden;
+        }
+        .onboarding::before {
+            content: ''; position: absolute; top: -30%; left: -15%; width: 70%; height: 70%;
+            background: radial-gradient(circle, rgba(26,107,78,0.15) 0%, transparent 70%); pointer-events: none;
+        }
+        .onboarding::after {
+            content: ''; position: absolute; bottom: -25%; right: -15%; width: 55%; height: 55%;
+            background: radial-gradient(circle, rgba(45,212,160,0.08) 0%, transparent 70%); pointer-events: none;
+        }
+        .onboarding.hide { opacity: 0; transform: scale(1.04); pointer-events: none; }
+
+        /* Steps container */
+        .ob-step { display: none; width: 100%; max-width: 780px; position: relative; z-index: 1; }
+        .ob-step.active { display: flex; animation: obFadeIn 0.5s ease; }
+
+        @keyframes obFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── STEP 1: Welcome ── */
+        .ob-welcome {
+            flex-direction: column; align-items: center; justify-content: center; text-align: center;
+        }
+        .ob-logo-big {
+            width: 72px; height: 72px; border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 28px; box-shadow: 0 16px 48px rgba(26,107,78,0.3);
+        }
+        .ob-logo-big svg { width: 36px; height: 36px; }
+        .ob-brand {
+            font-family: 'Playfair Display', serif; font-size: 3.2rem; font-weight: 700;
+            color: #fff; letter-spacing: -0.03em; margin-bottom: 6px;
+        }
+        .ob-brand span {
+            background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .ob-tagline {
+            font-size: 1.05rem; font-weight: 300; color: rgba(255,255,255,0.4);
+            max-width: 400px; line-height: 1.7; margin-bottom: 48px;
+        }
+        .ob-stats {
+            display: flex; gap: 40px; margin-bottom: 52px;
+        }
+        .ob-stat { text-align: center; }
+        .ob-stat-val {
+            font-family: 'Fira Code', monospace; font-size: 1.6rem; font-weight: 600;
+            color: #fff; margin-bottom: 4px;
+        }
+        .ob-stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: 0.06em; }
+
+        .ob-get-started {
+            padding: 16px 52px; background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            color: #fff; border: none; border-radius: 50px; font-size: 0.95rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: transform 0.15s, box-shadow 0.3s;
+        }
+        .ob-get-started:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(26,107,78,0.35); }
+        .ob-get-started:active { transform: scale(0.97); }
+
+        .ob-skip {
+            position: absolute; bottom: -48px; color: rgba(255,255,255,0.2); font-size: 0.78rem;
+            background: none; border: none; cursor: pointer; font-family: inherit;
+        }
+        .ob-skip:hover { color: rgba(255,255,255,0.4); }
+
+        /* ── STEP 2: Interests (card) ── */
+        .ob-card-step {
+            flex-direction: column; align-items: center;
+        }
+        .onboard-card {
+            width: 100%; max-width: 680px; background: #fff; border-radius: 20px;
+            padding: 40px 52px 44px; box-shadow: 0 4px 40px rgba(0,0,0,0.06); position: relative;
+        }
+        .onboard-card-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;
+        }
+        .ob-card-logo { display: flex; align-items: center; gap: 8px; font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+        .ob-card-logo-icon {
+            width: 26px; height: 26px; border-radius: 6px;
+            background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .ob-card-logo-icon svg { width: 14px; height: 14px; }
+        .ob-step-badge {
+            font-size: 0.68rem; font-weight: 500; color: var(--text-muted);
+            background: var(--bg); padding: 4px 12px; border-radius: 12px;
+        }
+        .onboard-progress { display: flex; gap: 6px; margin-bottom: 36px; }
+        .onboard-progress-bar { flex: 1; height: 4px; border-radius: 2px; background: #E8E8E4; overflow: hidden; }
+        .onboard-progress-bar .onboard-progress-fill {
+            height: 100%; border-radius: 2px; background: var(--text);
+            width: 0%; transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .onboard-question { font-size: 1.35rem; font-weight: 600; color: var(--text); margin-bottom: 28px; letter-spacing: -0.02em; }
+        .onboard-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 36px; }
+        .onboard-chip {
+            padding: 9px 18px; border: 1.5px solid #D8D8D4; border-radius: 50px; background: #fff;
+            font-size: 0.84rem; font-weight: 450; color: var(--text); font-family: inherit;
+            cursor: pointer; transition: all 0.2s ease; user-select: none;
+        }
+        .onboard-chip:hover { border-color: #BBB; background: #FAFAFA; }
+        .onboard-chip.selected { border-color: var(--text); background: var(--text); color: #fff; }
+        .onboard-footer { display: flex; justify-content: space-between; align-items: center; }
+        .ob-back-btn {
+            padding: 10px 20px; background: none; border: 1px solid var(--border); color: var(--text-soft);
+            border-radius: 50px; font-size: 0.85rem; font-weight: 500; font-family: inherit; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .ob-back-btn:hover { background: var(--bg); }
+        .onboard-btn {
+            padding: 12px 32px; background: var(--text); color: #fff; border: none; border-radius: 50px;
+            font-size: 0.88rem; font-weight: 600; font-family: inherit; cursor: pointer;
+            transition: transform 0.15s, opacity 0.2s;
+        }
+        .onboard-btn:hover { transform: translateY(-1px); opacity: 0.88; }
+        .onboard-btn:active { transform: scale(0.97); }
+
+        /* ── STEP 3: Features showcase ── */
+        .ob-features-step { flex-direction: column; align-items: center; }
+        .ob-features-card {
+            width: 100%; max-width: 720px; background: #fff; border-radius: 20px;
+            padding: 40px 52px 44px; box-shadow: 0 4px 40px rgba(0,0,0,0.06);
+        }
+        .ob-features-title {
+            font-size: 1.35rem; font-weight: 600; color: var(--text); margin-bottom: 8px; letter-spacing: -0.02em;
+        }
+        .ob-features-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 32px; }
+
+        .ob-feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 36px; }
+
+        .ob-feature-item {
+            padding: 24px 18px; border-radius: 14px; background: var(--bg);
+            border: 1px solid var(--border); text-align: center; transition: all 0.25s ease;
+        }
+        .ob-feature-item:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.04); }
+        .ob-feat-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+        }
+        .ob-feat-icon.green { background: rgba(26,107,78,0.12); }
+        .ob-feat-icon.blue { background: rgba(37,99,235,0.1); }
+        .ob-feat-icon.amber { background: rgba(233,163,25,0.1); }
+        .ob-feat-icon svg { width: 22px; height: 22px; }
+        .ob-feat-title { font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; }
+        .ob-feat-desc { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+        .ob-features-footer { display: flex; justify-content: space-between; align-items: center; }
+
+        .ob-final-btn {
+            padding: 14px 44px; background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            color: #fff; border: none; border-radius: 50px; font-size: 0.92rem; font-weight: 600;
+            font-family: inherit; cursor: pointer; transition: transform 0.15s, box-shadow 0.3s;
+        }
+        .ob-final-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(26,107,78,0.35); }
+        .ob-final-btn:active { transform: scale(0.97); }
+
+        @media (max-width: 720px) {
+            .onboard-card, .ob-features-card { margin: 16px; padding: 28px 20px 32px; }
+            .ob-feature-grid { grid-template-columns: 1fr; }
+            .ob-brand { font-size: 2.4rem; }
+            .ob-stats { gap: 20px; }
+        }
+
+        /* ═══════ MAIN APP — FULL PAGE ═══════ */
+        .app { opacity: 0; transition: opacity 0.5s ease 0.3s; display: flex; flex-direction: column; height: 100vh; }
+        .app.show { opacity: 1; }
+
+        .nav {
+            z-index: 50; background: var(--surface); border-bottom: 1px solid var(--border);
+            padding: 0 28px; height: 52px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+        }
+        .nav-brand { font-size: 0.92rem; font-weight: 700; letter-spacing: -0.02em; color: var(--text); display: flex; align-items: center; gap: 8px; }
+        .nav-logo {
+            width: 24px; height: 24px; border-radius: 6px;
+            background: linear-gradient(135deg, var(--accent) 0%, #2DD4A0 100%);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .nav-logo svg { width: 14px; height: 14px; }
+        .nav-pill { font-size: 0.68rem; font-weight: 500; color: var(--accent); background: var(--accent-light); padding: 3px 10px; border-radius: 12px; }
+        .nav-btn {
+            font-size: 0.68rem; font-weight: 500; color: var(--accent); background: var(--accent-light);
+            padding: 5px 12px; border-radius: 12px; border: none; cursor: pointer; font-family: inherit;
+            transition: opacity .2s;
+        }
+        .nav-btn:hover { opacity: 0.7; }
+
+        /* ═══════ MAIN LAYOUT ═══════ */
+        .main-layout {
+            flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+            overflow: hidden; min-height: 0;
+        }
+
+        /* ── LEFT PANEL: Upload & Preview ── */
+        .left-panel {
+            display: flex; flex-direction: column; border-right: 1px solid var(--border);
+            background: var(--surface); overflow: hidden;
+        }
+
+        .left-header {
+            padding: 28px 32px 0;
+            flex-shrink: 0;
+        }
+
+        .page-eyebrow {
+            font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.08em; color: var(--accent); margin-bottom: 6px;
+        }
+        .page-title {
+            font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700;
+            letter-spacing: -0.03em; margin-bottom: 4px;
+        }
+        .page-sub { color: var(--text-muted); font-size: 0.82rem; line-height: 1.5; }
+
+        .left-content {
+            flex: 1; display: flex; flex-direction: column; padding: 20px 32px 24px;
+            min-height: 0; overflow-y: auto;
+        }
+
+        /* Drop zone */
+        .drop-zone {
+            border: 1.5px dashed var(--border); border-radius: var(--radius); background: var(--bg);
+            padding: 36px 24px; text-align: center; cursor: pointer; transition: all 0.25s ease;
+            flex-shrink: 0;
+        }
+        .drop-zone:hover { border-color: #CCC; }
+        .drop-zone.dragover { border-color: var(--accent); background: var(--accent-light); }
+        .drop-zone.has-preview { padding: 0; border-style: solid; border-color: var(--border); overflow: hidden; }
+
+        .drop-icon {
+            width: 44px; height: 44px; border-radius: 12px; background: var(--accent-light);
+            display: flex; align-items: center; justify-content: center; margin: 0 auto 14px;
+        }
+        .drop-icon svg { width: 22px; height: 22px; color: var(--accent); }
+        .drop-zone p { color: var(--text-soft); font-size: 0.85rem; margin-bottom: 18px; }
+        .drop-zone p span { color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+        .drop-zone input[type="file"] { display: none; }
+
+        .btn-row { display: flex; justify-content: center; gap: 10px; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px;
+            font-size: 0.82rem; font-weight: 500; font-family: inherit; border: none;
+            border-radius: 9px; cursor: pointer; transition: all 0.15s ease;
+        }
+        .btn:active { transform: scale(0.97); }
+        .btn-accent { background: var(--accent); color: #fff; }
+        .btn-accent:hover { background: #155A40; }
+        .btn-ghost { background: transparent; color: var(--text-soft); border: 1px solid var(--border); }
+        .btn-ghost:hover { background: var(--border-soft); }
+        .btn svg { width: 16px; height: 16px; }
+
+        /* Preview image */
+        .preview-area { display: none; flex-direction: column; flex: 1; min-height: 0; }
+        .preview-area.show { display: flex; }
+
+        .preview-img-wrap {
+            flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+            background: #F5F5F3; border-radius: var(--radius); overflow: hidden; margin-bottom: 14px;
+        }
+        .preview-img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+
+        .preview-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-shrink: 0;
+        }
+        .preview-filename { font-size: 0.78rem; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 200px; }
+
+        .upload-default { flex-shrink: 0; }
+        .upload-default.hidden { display: none; }
+
+        /* History strip */
+        .history-strip {
+            margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border);
+            flex-shrink: 0; display: none;
+        }
+        .history-strip.show { display: block; }
+        .history-strip-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .section-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); }
+        .link-btn { font-size: 0.75rem; color: var(--accent); background: none; border: none; cursor: pointer; font-family: inherit; font-weight: 500; }
+        .link-btn:hover { text-decoration: underline; }
+
+        .history-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; }
+        .history-row::-webkit-scrollbar { height: 0; }
+
+        .history-chip {
+            flex-shrink: 0; display: flex; align-items: center; gap: 10px; background: var(--surface);
+            border: 1px solid var(--border); border-radius: 12px; padding: 8px 14px 8px 8px;
+            cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .history-chip:hover { border-color: var(--accent); box-shadow: 0 3px 12px rgba(26,107,78,0.08); transform: translateY(-1px); }
+        .history-chip img { width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .history-chip-info { min-width: 0; }
+        .history-chip-name { font-size: 0.78rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 110px; }
+        .history-chip-cal { font-size: 0.7rem; color: var(--accent); font-family: 'Fira Code', monospace; font-weight: 500; }
+
+        /* ── RIGHT PANEL: Results ── */
+        .right-panel {
+            display: flex; flex-direction: column; overflow-y: auto;
+            background: var(--bg); padding: 20px 24px;
+        }
+
+        .right-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 14px; flex-shrink: 0;
+        }
+
+        .right-title { font-size: 0.92rem; font-weight: 700; letter-spacing: -0.01em; }
+
+        /* Placeholder grid */
+        .placeholder-state { flex: 1; display: flex; flex-direction: column; }
+        .placeholder-state.hidden { display: none; }
+
+        .nutri-placeholder-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px;
+        }
+
+        .nutri-placeholder-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 14px 12px; text-align: center; position: relative; overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        .nutri-placeholder-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; opacity: 0.5;
+        }
+        .nutri-placeholder-card:nth-child(1)::after { background: var(--red); }
+        .nutri-placeholder-card:nth-child(2)::after { background: var(--blue); }
+        .nutri-placeholder-card:nth-child(3)::after { background: var(--amber); }
+        .nutri-placeholder-card:nth-child(4)::after { background: var(--green); }
+        .nutri-placeholder-card:nth-child(5)::after { background: var(--violet); }
+        .nutri-placeholder-card:nth-child(6)::after { background: var(--accent); }
+
+        .npc-icon { font-size: 1.4rem; margin-bottom: 8px; }
+        .npc-label { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); margin-bottom: 6px; }
+        .npc-value {
+            font-family: 'Fira Code', monospace; font-size: 1.2rem; font-weight: 600; color: var(--border);
+            transition: color 0.4s ease;
+        }
+        .npc-value.filled { color: var(--text); }
+        .npc-unit { font-size: 0.7rem; font-weight: 400; color: var(--text-muted); }
+
+        /* Food detection card */
+        .detection-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 14px 16px; margin-bottom: 10px; position: relative; overflow: hidden;
+            transition: all 0.4s ease;
+        }
+        .detection-card.top { border-color: var(--accent); }
+        .detection-card.top::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--accent) 0%, #2DD4A0 100%);
+        }
+        .detection-rank {
+            font-size: 0.68rem; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 6px;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .detection-rank .dot { width: 5px; height: 5px; border-radius: 50%; }
+        .detection-card.top .detection-rank { color: var(--accent); }
+        .detection-card.top .detection-rank .dot { background: var(--accent); }
+        .detection-rank .dot { background: var(--text-muted); }
+
+        .detection-header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+        .detection-name {
+            font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; letter-spacing: -0.02em;
+        }
+        .detection-name.sm { font-family: 'Inter', sans-serif; font-size: 0.95rem; font-weight: 600; }
+
+        .confidence-badge {
+            font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 600;
+            padding: 3px 9px; border-radius: 6px; white-space: nowrap;
+        }
+        .badge-high { background: var(--accent-light); color: var(--accent); }
+        .badge-med { background: var(--accent-warm-light); color: var(--amber); }
+        .badge-low { background: #F3F4F6; color: var(--text-muted); }
+
+        .confidence-track { width: 100%; height: 3px; background: var(--border-soft); border-radius: 2px; overflow: hidden; }
+        .confidence-fill { height: 100%; border-radius: 2px; transition: width 0.7s cubic-bezier(0.25, 1, 0.5, 1); }
+        .fill-high { background: linear-gradient(90deg, var(--accent), #2DD4A0); }
+        .fill-med { background: var(--amber); }
+        .fill-low { background: var(--text-muted); }
+
+        .serving-info { font-size: 0.74rem; color: var(--text-muted); margin-top: 8px; }
+
+        /* Mini nutrition row inside detection card */
+        .mini-nutrition { display: flex; gap: 12px; margin-top: 10px; flex-wrap: wrap; }
+        .mini-nut { text-align: center; }
+        .mini-nut-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+        .mini-nut-val { font-family: 'Fira Code', monospace; font-size: 0.82rem; font-weight: 600; }
+
+        /* Empty state */
+        .empty-state {
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; color: var(--text-muted);
+        }
+        .empty-state svg { margin-bottom: 16px; opacity: 0.3; }
+        .empty-state p { font-size: 0.85rem; }
+        .empty-state .tags { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+        .empty-state .tag {
+            font-size: 0.72rem; padding: 5px 14px; border-radius: 50px; background: var(--surface);
+            border: 1px solid var(--border); color: var(--text-soft);
+        }
+
+        /* Spinner */
+        .analyzing-overlay {
+            display: none; position: absolute; inset: 0; background: rgba(248,248,246,0.85);
+            z-index: 10; align-items: center; justify-content: center; flex-direction: column;
+            border-radius: var(--radius);
+        }
+        .analyzing-overlay.show { display: flex; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner-ring {
+            width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent);
+            border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;
+        }
+        .spinner-text { font-size: 0.82rem; color: var(--text-muted); }
+
+        /* Results state */
+        .results-state { display: none; flex-direction: column; flex: 1; min-height: 0; overflow-y: auto; }
+        .results-state.show { display: flex; }
+
+        /* Error */
+        .error-msg {
+            text-align: center; color: var(--red); font-size: 0.85rem; display: none;
+            padding: 12px; background: #FEF2F2; border-radius: var(--radius-sm); margin-bottom: 12px;
+        }
+
+        /* Camera Modal */
+        .camera-modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100;
+            align-items: center; justify-content: center; backdrop-filter: blur(8px);
+        }
+        .camera-modal.show { display: flex; }
+        .camera-box { background: #0D0D0D; border-radius: 20px; padding: 16px; max-width: 480px; width: 92%; border: 1px solid rgba(255,255,255,0.08); }
+        .camera-box video { width: 100%; border-radius: 12px; display: block; }
+        .camera-actions { margin-top: 12px; display: flex; justify-content: center; gap: 12px; }
+        .camera-actions .btn-ghost { border-color: rgba(255,255,255,0.15); color: rgba(255,255,255,0.6); }
+
+        /* Footer in right panel */
+        .panel-footer { margin-top: auto; padding-top: 16px; text-align: center; font-size: 0.7rem; color: var(--text-muted); flex-shrink: 0; }
+        .panel-footer span { color: var(--accent); font-weight: 500; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-up { animation: fadeUp 0.4s cubic-bezier(0.4, 0, 0, 1); }
+
+        /* ═══════ DAILY INTAKE TRACKER ═══════ */
+        .intake-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 18px 20px; margin-bottom: 16px;
+        }
+        .intake-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .intake-title { font-size: 0.82rem; font-weight: 700; }
+        .intake-date { font-size: 0.68rem; color: var(--text-muted); }
+        .intake-bars { display: flex; flex-direction: column; gap: 10px; }
+        .intake-row { display: flex; align-items: center; gap: 10px; }
+        .intake-label { font-size: 0.7rem; font-weight: 600; color: var(--text-soft); width: 52px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .intake-track { flex: 1; height: 8px; background: var(--border-soft); border-radius: 4px; overflow: hidden; position: relative; }
+        .intake-fill { height: 100%; border-radius: 4px; transition: width 0.6s cubic-bezier(0.25,1,0.5,1); }
+        .intake-fill.cal { background: linear-gradient(90deg, var(--red), #FF6B6B); }
+        .intake-fill.pro { background: linear-gradient(90deg, var(--blue), #60A5FA); }
+        .intake-fill.fat { background: linear-gradient(90deg, var(--amber), #FCD34D); }
+        .intake-fill.carb { background: linear-gradient(90deg, var(--green), #2DD4A0); }
+        .intake-fill.fib { background: linear-gradient(90deg, var(--violet), #A78BFA); }
+        .intake-nums { font-family: 'Fira Code', monospace; font-size: 0.7rem; color: var(--text-muted); width: 80px; text-align: right; white-space: nowrap; }
+
+        /* ═══════ PIE CHART ═══════ */
+        .macro-chart-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 18px 20px; margin-bottom: 16px; display: none;
+        }
+        .macro-chart-section.show { display: block; }
+        .macro-chart-header { font-size: 0.82rem; font-weight: 700; margin-bottom: 12px; }
+        .macro-chart-wrap { display: flex; align-items: center; gap: 20px; }
+        .macro-canvas-wrap { width: 120px; height: 120px; flex-shrink: 0; }
+        .macro-canvas-wrap canvas { width: 100%; height: 100%; }
+        .macro-legend { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .macro-legend-item { display: flex; align-items: center; gap: 8px; }
+        .macro-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+        .macro-legend-label { font-size: 0.75rem; color: var(--text-soft); }
+        .macro-legend-val { font-family: 'Fira Code', monospace; font-size: 0.78rem; font-weight: 600; margin-left: auto; }
+
+        /* ═══════ MEAL SUGGESTIONS ═══════ */
+        .suggestions-section {
+            background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 18px 20px; margin-bottom: 16px; display: none;
+        }
+        .suggestions-section.show { display: block; }
+        .suggestions-header { font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; }
+        .suggestions-sub { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 12px; }
+        .suggestion-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+        .suggestion-chip {
+            padding: 6px 14px; border-radius: 50px; font-size: 0.75rem; font-weight: 500;
+            background: var(--accent-light); color: var(--accent); border: none; cursor: default;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .suggestion-chip .s-cal { font-family: 'Fira Code', monospace; font-size: 0.68rem; opacity: 0.7; }
+
+        /* ═══════ GRAD-CAM ═══════ */
+        .gradcam-wrap {
+            position: relative; display: none; margin-top: 10px;
+        }
+        .gradcam-wrap.show { display: block; }
+        .gradcam-img {
+            width: 100%; border-radius: var(--radius); display: block;
+        }
+        .gradcam-badge {
+            position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7);
+            color: #fff; font-size: 0.68rem; font-weight: 600; padding: 4px 10px;
+            border-radius: 6px; letter-spacing: 0.03em;
+        }
+        .gradcam-toggle {
+            font-size: 0.72rem; color: var(--accent); background: var(--accent-light);
+            border: none; padding: 5px 12px; border-radius: 8px; cursor: pointer;
+            font-family: inherit; font-weight: 500; transition: opacity 0.2s;
+        }
+        .gradcam-toggle:hover { opacity: 0.7; }
+    </style>
+</head>
+<body>
+
+    <!-- Onboarding -->
+    <div class="onboarding" id="onboarding">
+
+        <!-- STEP 1: Welcome -->
+        <div class="ob-step ob-welcome active" id="obStep1">
+            <div class="ob-logo-big">
+                <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </div>
+            <h1 class="ob-brand">Nutri<span>Snap</span></h1>
+            <p class="ob-tagline">Snap a photo of your meal. Our AI identifies the food and delivers a full nutritional breakdown in seconds.</p>
+            <div class="ob-stats">
+                <div class="ob-stat">
+                    <div class="ob-stat-val">101</div>
+                    <div class="ob-stat-label">Food Classes</div>
+                </div>
+                <div class="ob-stat">
+                    <div class="ob-stat-val">80%+</div>
+                    <div class="ob-stat-label">Accuracy</div>
+                </div>
+                <div class="ob-stat">
+                    <div class="ob-stat-val">&lt;3s</div>
+                    <div class="ob-stat-label">Analysis</div>
+                </div>
+                <div class="ob-stat">
+                    <div class="ob-stat-val">USDA</div>
+                    <div class="ob-stat-label">Nutrition Data</div>
+                </div>
+            </div>
+            <button class="ob-get-started" id="obNext1">Get Started</button>
+            <button class="ob-skip" id="obSkip">Skip onboarding</button>
+        </div>
+
+        <!-- STEP 2: Interests -->
+        <div class="ob-step ob-card-step" id="obStep2">
+            <div class="onboard-card">
+                <div class="onboard-card-header">
+                    <div class="ob-card-logo">
+                        <div class="ob-card-logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                        </div>
+                        NutriSnap
+                    </div>
+                    <span class="ob-step-badge">Step 1 of 2</span>
+                </div>
+                <div class="onboard-progress">
+                    <div class="onboard-progress-bar"><div class="onboard-progress-fill" id="progressFill1"></div></div>
+                    <div class="onboard-progress-bar"><div class="onboard-progress-fill" id="progressFill2"></div></div>
+                </div>
+                <h2 class="onboard-question">What are you most interested in tracking?</h2>
+                <div class="onboard-chips">
+                    <button class="onboard-chip">Calorie Counting</button>
+                    <button class="onboard-chip">Weight Loss</button>
+                    <button class="onboard-chip">Muscle Building</button>
+                    <button class="onboard-chip">Healthy Eating</button>
+                    <button class="onboard-chip">Meal Planning</button>
+                    <button class="onboard-chip">Protein Intake</button>
+                    <button class="onboard-chip">Low Carb</button>
+                    <button class="onboard-chip">Food Allergies</button>
+                    <button class="onboard-chip">Portion Control</button>
+                    <button class="onboard-chip">Dietary Fiber</button>
+                    <button class="onboard-chip">Diabetes Management</button>
+                    <button class="onboard-chip">Heart Health</button>
+                    <button class="onboard-chip">Vegetarian</button>
+                    <button class="onboard-chip">Vegan</button>
+                    <button class="onboard-chip">Keto</button>
+                    <button class="onboard-chip">Intermittent Fasting</button>
+                    <button class="onboard-chip">Sports Nutrition</button>
+                    <button class="onboard-chip">Kids Nutrition</button>
+                    <button class="onboard-chip">Food Logging</button>
+                    <button class="onboard-chip">Mindful Eating</button>
+                </div>
+                <div class="onboard-footer">
+                    <button class="ob-back-btn" id="obBack2">Back</button>
+                    <button class="onboard-btn" id="obNext2">Continue</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STEP 3: Features -->
+        <div class="ob-step ob-features-step" id="obStep3">
+            <div class="ob-features-card">
+                <div class="onboard-card-header">
+                    <div class="ob-card-logo">
+                        <div class="ob-card-logo-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                        </div>
+                        NutriSnap
+                    </div>
+                    <span class="ob-step-badge">Step 2 of 2</span>
+                </div>
+                <h2 class="ob-features-title">Here's what you can do</h2>
+                <p class="ob-features-sub">Everything you need for effortless dietary tracking</p>
+                <div class="ob-feature-grid">
+                    <div class="ob-feature-item">
+                        <div class="ob-feat-icon green">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#1A6B4E" stroke-width="1.5"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                        </div>
+                        <div class="ob-feat-title">Snap or Upload</div>
+                        <div class="ob-feat-desc">Use your camera or pick a photo from your gallery</div>
+                    </div>
+                    <div class="ob-feature-item">
+                        <div class="ob-feat-icon blue">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                        </div>
+                        <div class="ob-feat-title">AI Recognition</div>
+                        <div class="ob-feat-desc">EfficientNetV2 trained on 101,000 food images</div>
+                    </div>
+                    <div class="ob-feature-item">
+                        <div class="ob-feat-icon amber">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="#E9A319" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        </div>
+                        <div class="ob-feat-title">Full Breakdown</div>
+                        <div class="ob-feat-desc">Calories, protein, fat, carbs and fiber per serving</div>
+                    </div>
+                </div>
+                <div class="ob-features-footer">
+                    <button class="ob-back-btn" id="obBack3">Back</button>
+                    <button class="ob-final-btn" id="startBtn">Start Analyzing</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="app">
+        <nav class="nav">
+            <div class="nav-brand">
+                <div class="nav-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </div>
+                NutriSnap
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+                <a href="/training-page" class="nav-btn" style="text-decoration:none;">Training Curves</a>
+                <button class="nav-btn" id="showOnboardBtn">Onboarding</button>
+                <span class="nav-pill">v1.0</span>
+            </div>
+        </nav>
+
+        <div class="main-layout">
+            <!-- LEFT: Upload + Preview -->
+            <div class="left-panel">
+                <div class="left-header">
+                    <div class="page-eyebrow">Analyze</div>
+                    <h1 class="page-title">What are you eating?</h1>
+                    <p class="page-sub">Upload or capture a food photo for instant nutritional analysis</p>
+                </div>
+
+                <div class="left-content">
+                    <!-- Upload (default state) -->
+                    <div class="upload-default" id="uploadDefault">
+                        <div class="drop-zone" id="dropZone">
+                            <div class="drop-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                            </div>
+                            <p>Drag and drop an image, or <span>browse</span></p>
+                            <div class="btn-row">
+                                <label class="btn btn-accent" for="fileInput">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                    Upload
+                                </label>
+                                <button class="btn btn-ghost" id="cameraBtn" type="button">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                                    Camera
+                                </button>
+                            </div>
+                            <input type="file" id="fileInput" accept="image/*">
+                        </div>
+                    </div>
+
+                    <!-- Preview (after file selected) -->
+                    <div class="preview-area" id="previewArea">
+                        <div class="preview-img-wrap" id="previewImgWrap">
+                            <img id="previewImg" class="preview-img" src="" alt="Food preview">
+                        </div>
+                        <!-- Grad-CAM overlay -->
+                        <div class="gradcam-wrap" id="gradcamWrap">
+                            <img id="gradcamImg" class="gradcam-img" src="" alt="Grad-CAM heatmap">
+                            <span class="gradcam-badge">AI Attention Map</span>
+                        </div>
+                        <div class="preview-bar">
+                            <span class="preview-filename" id="previewFilename">image.jpg</span>
+                            <div style="display:flex;gap:8px;align-items:center;">
+                                <button class="gradcam-toggle" id="gradcamBtn" type="button" style="display:none;">Heatmap</button>
+                                <button class="btn btn-ghost" id="changeBtn" type="button" style="padding:7px 14px;font-size:0.78rem;">Change</button>
+                                <button class="btn btn-accent" id="analyzeBtn" type="button">
+                                    Analyze
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="9 18 15 12 9 6"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History strip at bottom -->
+                    <div class="history-strip" id="historyStrip">
+                        <div class="history-strip-header">
+                            <span class="section-label">Recent</span>
+                            <button class="link-btn" id="clearHistoryBtn">Clear</button>
+                        </div>
+                        <div class="history-row" id="historyRow"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT: Nutrition Dashboard -->
+            <div class="right-panel" id="rightPanel">
+                <div class="right-header">
+                    <span class="right-title">Nutrition Dashboard</span>
+                    <button class="link-btn" id="newAnalysisBtn" style="display:none;">New analysis</button>
+                </div>
+
+                <p class="error-msg" id="errorMsg"></p>
+
+                <!-- Placeholder state (before analysis) -->
+                <div class="placeholder-state" id="placeholderState">
+                    <div class="nutri-placeholder-grid">
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Calories</div>
+                            <div class="npc-value" id="ph-cal">---<span class="npc-unit"> kcal</span></div>
+                        </div>
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Protein</div>
+                            <div class="npc-value" id="ph-protein">---<span class="npc-unit"> g</span></div>
+                        </div>
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Fat</div>
+                            <div class="npc-value" id="ph-fat">---<span class="npc-unit"> g</span></div>
+                        </div>
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Carbs</div>
+                            <div class="npc-value" id="ph-carbs">---<span class="npc-unit"> g</span></div>
+                        </div>
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Fiber</div>
+                            <div class="npc-value" id="ph-fiber">---<span class="npc-unit"> g</span></div>
+                        </div>
+                        <div class="nutri-placeholder-card">
+                            <div class="npc-label">Serving</div>
+                            <div class="npc-value" id="ph-serving" style="font-size:0.9rem;">---</div>
+                        </div>
+                    </div>
+
+                    <!-- Detection cards placeholder -->
+                    <div class="detection-card" style="opacity:0.4;">
+                        <div class="detection-rank"><div class="dot"></div> Best match</div>
+                        <div class="detection-header">
+                            <span class="detection-name" style="color:var(--text-muted);">Upload a photo to identify</span>
+                        </div>
+                        <div class="confidence-track"><div class="confidence-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="detection-card" style="opacity:0.25;">
+                        <div class="detection-rank"><div class="dot"></div> 2nd match</div>
+                        <div class="detection-header">
+                            <span class="detection-name sm" style="color:var(--text-muted);">---</span>
+                        </div>
+                        <div class="confidence-track"><div class="confidence-fill" style="width:0%"></div></div>
+                    </div>
+                    <div class="detection-card" style="opacity:0.2;">
+                        <div class="detection-rank"><div class="dot"></div> 3rd match</div>
+                        <div class="detection-header">
+                            <span class="detection-name sm" style="color:var(--text-muted);">---</span>
+                        </div>
+                        <div class="confidence-track"><div class="confidence-fill" style="width:0%"></div></div>
+                    </div>
+
+                    <div class="empty-state" style="flex:0; margin-top: 24px;">
+                        <div class="tags">
+                            <span class="tag">Pizza</span>
+                            <span class="tag">Sushi</span>
+                            <span class="tag">Caesar Salad</span>
+                            <span class="tag">Burger</span>
+                            <span class="tag">Pad Thai</span>
+                            <span class="tag">Tiramisu</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Food name banner -->
+                <div id="foodNameBanner" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;margin-bottom:10px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div>
+                            <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;letter-spacing:-0.02em;" id="foodNameText"></div>
+                            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;" id="foodConfText"></div>
+                        </div>
+                        <span class="confidence-badge" id="foodConfBadge"></span>
+                    </div>
+                </div>
+
+                <!-- Results state (detection cards) -->
+                <div class="results-state" id="resultsState"></div>
+
+                <!-- Daily Intake -->
+                <div class="intake-section" id="intakeSection">
+                    <div class="intake-header">
+                        <span class="intake-title">Daily Intake</span>
+                        <span class="intake-date" id="intakeDate"></span>
+                    </div>
+                    <div class="intake-bars">
+                        <div class="intake-row">
+                            <span class="intake-label">Cal</span>
+                            <div class="intake-track"><div class="intake-fill cal" id="intCal" style="width:0%"></div></div>
+                            <span class="intake-nums" id="intCalNum">0 / 2000</span>
+                        </div>
+                        <div class="intake-row">
+                            <span class="intake-label">Protein</span>
+                            <div class="intake-track"><div class="intake-fill pro" id="intPro" style="width:0%"></div></div>
+                            <span class="intake-nums" id="intProNum">0 / 50g</span>
+                        </div>
+                        <div class="intake-row">
+                            <span class="intake-label">Fat</span>
+                            <div class="intake-track"><div class="intake-fill fat" id="intFat" style="width:0%"></div></div>
+                            <span class="intake-nums" id="intFatNum">0 / 65g</span>
+                        </div>
+                        <div class="intake-row">
+                            <span class="intake-label">Carbs</span>
+                            <div class="intake-track"><div class="intake-fill carb" id="intCarb" style="width:0%"></div></div>
+                            <span class="intake-nums" id="intCarbNum">0 / 300g</span>
+                        </div>
+                        <div class="intake-row">
+                            <span class="intake-label">Fiber</span>
+                            <div class="intake-track"><div class="intake-fill fib" id="intFib" style="width:0%"></div></div>
+                            <span class="intake-nums" id="intFibNum">0 / 25g</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Healthier Alternatives -->
+                <div class="suggestions-section" id="suggestionsSection">
+                    <div class="suggestions-header">Healthier Alternatives</div>
+                    <div class="suggestions-sub">Lower-calorie options from our 101 food classes</div>
+                    <div class="suggestion-chips" id="suggestionChips"></div>
+                </div>
+
+                <!-- Analyzing overlay -->
+                <div class="analyzing-overlay" id="analyzingOverlay">
+                    <div class="spinner-ring"></div>
+                    <span class="spinner-text">Analyzing your meal...</span>
+                </div>
+
+                <div class="panel-footer">Built with <span>EfficientNetV2</span> &middot; Food-101 &middot; USDA Nutrition Data</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div class="camera-modal" id="cameraModal">
+        <div class="camera-box">
+            <video id="cameraVideo" autoplay playsinline></video>
+            <canvas id="cameraCanvas" style="display:none;"></canvas>
+            <div class="camera-actions">
+                <button class="btn btn-accent" id="captureBtn" type="button">Capture</button>
+                <button class="btn btn-ghost" id="closeCameraBtn" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ── Onboarding ──
+        const onboarding = document.getElementById('onboarding');
+        const app = document.getElementById('app');
+        const progressFill1 = document.getElementById('progressFill1');
+        const progressFill2 = document.getElementById('progressFill2');
+        const allChips = document.querySelectorAll('.onboard-chip');
+        const totalChips = allChips.length;
+        const obSteps = [document.getElementById('obStep1'), document.getElementById('obStep2'), document.getElementById('obStep3')];
+        let currentObStep = 0;
+
+        function goToStep(n) {
+            obSteps[currentObStep].classList.remove('active');
+            currentObStep = n;
+            obSteps[currentObStep].classList.remove('active');
+            // Force reflow for animation
+            void obSteps[currentObStep].offsetWidth;
+            obSteps[currentObStep].classList.add('active');
+        }
+
+        function updateProgress() {
+            const selected = document.querySelectorAll('.onboard-chip.selected').length;
+            const pct = (selected / totalChips) * 100;
+            progressFill1.style.width = Math.min(pct * 2, 100) + '%';
+            progressFill2.style.width = Math.max((pct - 50) * 2, 0) + '%';
+        }
+        allChips.forEach(chip => {
+            chip.addEventListener('click', () => { chip.classList.toggle('selected'); updateProgress(); });
+        });
+        updateProgress();
+
+        // Step navigation
+        document.getElementById('obNext1').addEventListener('click', () => goToStep(1));
+        document.getElementById('obBack2').addEventListener('click', () => goToStep(0));
+        document.getElementById('obNext2').addEventListener('click', () => goToStep(2));
+        document.getElementById('obBack3').addEventListener('click', () => goToStep(1));
+        document.getElementById('obSkip').addEventListener('click', dismissOnboarding);
+
+        function dismissOnboarding() {
+            onboarding.classList.add('hide');
+            app.classList.add('show');
+            localStorage.setItem('nutrisnap_onboarded', '1');
+        }
+        if (localStorage.getItem('nutrisnap_onboarded')) {
+            onboarding.style.display = 'none';
+            app.classList.add('show');
+        }
+        document.getElementById('startBtn').addEventListener('click', dismissOnboarding);
+        document.getElementById('showOnboardBtn').addEventListener('click', () => {
+            localStorage.removeItem('nutrisnap_onboarded');
+            onboarding.style.display = '';
+            onboarding.classList.remove('hide');
+            app.classList.remove('show');
+            // Reset to step 1
+            obSteps.forEach(s => s.classList.remove('active'));
+            currentObStep = 0;
+            obSteps[0].classList.add('active');
+            document.querySelectorAll('.onboard-chip').forEach(c => c.classList.remove('selected'));
+            updateProgress();
+        });
+
+        // ── Elements ──
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadDefault = document.getElementById('uploadDefault');
+        const previewArea = document.getElementById('previewArea');
+        const previewImg = document.getElementById('previewImg');
+        const previewFilename = document.getElementById('previewFilename');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const analyzingOverlay = document.getElementById('analyzingOverlay');
+        const errorMsg = document.getElementById('errorMsg');
+        const placeholderState = document.getElementById('placeholderState');
+        const resultsState = document.getElementById('resultsState');
+        const newAnalysisBtn = document.getElementById('newAnalysisBtn');
+        let currentFile = null;
+        let cameraStream = null;
+
+        // ── Drag & Drop ──
+        dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault(); dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length > 0 && e.dataTransfer.files[0].type.startsWith('image/'))
+                handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', () => { if (fileInput.files.length > 0) handleFile(fileInput.files[0]); });
+
+        function handleFile(file) {
+            currentFile = file;
+            previewFilename.textContent = file.name;
+            const reader = new FileReader();
+            reader.onload = e => {
+                previewImg.src = e.target.result;
+                uploadDefault.classList.add('hidden');
+                previewArea.classList.add('show');
+                errorMsg.style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Change button
+        document.getElementById('changeBtn').addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // ── Camera ──
+        document.getElementById('cameraBtn').addEventListener('click', async () => {
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                document.getElementById('cameraVideo').srcObject = cameraStream;
+                document.getElementById('cameraModal').classList.add('show');
+            } catch { alert('Camera access denied.'); }
+        });
+        document.getElementById('closeCameraBtn').addEventListener('click', stopCamera);
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            const v = document.getElementById('cameraVideo');
+            const c = document.getElementById('cameraCanvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext('2d').drawImage(v, 0, 0);
+            c.toBlob(blob => {
+                handleFile(new File([blob], 'capture.jpg', { type: 'image/jpeg' }));
+                stopCamera();
+            }, 'image/jpeg', 0.92);
+        });
+        function stopCamera() {
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+            document.getElementById('cameraModal').classList.remove('show');
+        }
+
+        // ── Analyze ──
+        analyzeBtn.addEventListener('click', async () => {
+            if (!currentFile) return;
+            analyzingOverlay.classList.add('show');
+            resultsState.classList.remove('show');
+            errorMsg.style.display = 'none';
+
+            const fd = new FormData();
+            fd.append('file', currentFile);
+
+            try {
+                const res = await fetch('/predict', { method: 'POST', body: fd });
+                const data = await res.json();
+                analyzingOverlay.classList.remove('show');
+                if (data.error) {
+                    errorMsg.textContent = data.error; errorMsg.style.display = 'block'; return;
+                }
+                renderResults(data.predictions);
+                addToHistory(data.predictions, previewImg.src);
+            } catch {
+                analyzingOverlay.classList.remove('show');
+                errorMsg.textContent = 'Something went wrong. Please try again.';
+                errorMsg.style.display = 'block';
+            }
+        });
+
+        // ── Healthier alternatives DB (lower cal foods from Food-101) ──
+        const healthyAlts = [
+            { name: 'Edamame', cal: 121 }, { name: 'Greek Salad', cal: 130 }, { name: 'Sashimi', cal: 140 },
+            { name: 'Ceviche', cal: 150 }, { name: 'Miso Soup', cal: 84 }, { name: 'Caesar Salad', cal: 180 },
+            { name: 'Seaweed Salad', cal: 100 }, { name: 'Spring Rolls', cal: 135 }, { name: 'Sushi', cal: 200 },
+            { name: 'Caprese Salad', cal: 165 }, { name: 'Bruschetta', cal: 170 }, { name: 'Oysters', cal: 80 },
+            { name: 'Escargots', cal: 90 }, { name: 'Beet Salad', cal: 120 }, { name: 'Cup Cakes', cal: 160 },
+        ];
+
+        // ── Render Results ──
+        function getBadgeClass(conf) { return conf >= 60 ? 'badge-high' : conf >= 30 ? 'badge-med' : 'badge-low'; }
+        function getFillClass(conf) { return conf >= 60 ? 'fill-high' : conf >= 30 ? 'fill-med' : 'fill-low'; }
+
+        function renderResults(predictions) {
+            const top = predictions[0];
+            const n = top.nutrition;
+
+            // Fill the placeholder grid with real values
+            document.getElementById('ph-cal').innerHTML = `${n.calories}<span class="npc-unit"> kcal</span>`;
+            document.getElementById('ph-cal').classList.add('filled');
+            document.getElementById('ph-protein').innerHTML = `${n.protein}<span class="npc-unit"> g</span>`;
+            document.getElementById('ph-protein').classList.add('filled');
+            document.getElementById('ph-fat').innerHTML = `${n.fat}<span class="npc-unit"> g</span>`;
+            document.getElementById('ph-fat').classList.add('filled');
+            document.getElementById('ph-carbs').innerHTML = `${n.carbs}<span class="npc-unit"> g</span>`;
+            document.getElementById('ph-carbs').classList.add('filled');
+            document.getElementById('ph-fiber').innerHTML = `${n.fiber}<span class="npc-unit"> g</span>`;
+            document.getElementById('ph-fiber').classList.add('filled');
+            document.getElementById('ph-serving').innerHTML = `${n.serving_size}`;
+            document.getElementById('ph-serving').classList.add('filled');
+
+            // ── Food Name Banner ──
+            const banner = document.getElementById('foodNameBanner');
+            document.getElementById('foodNameText').textContent = top.display_name;
+            document.getElementById('foodConfText').textContent = `${top.confidence.toFixed(1)}% confidence · Per ${n.serving_size}`;
+            const confBadge = document.getElementById('foodConfBadge');
+            confBadge.textContent = top.confidence.toFixed(1) + '%';
+            confBadge.className = 'confidence-badge ' + getBadgeClass(top.confidence);
+            banner.style.display = 'block';
+
+            // Build detection cards
+            const ranks = ['Best match', '2nd match', '3rd match'];
+            let html = '';
+            predictions.forEach((pred, i) => {
+                const pn = pred.nutrition;
+                const isTop = i === 0;
+                html += `
+                <div class="detection-card ${isTop ? 'top' : ''} fade-up" style="animation-delay:${i * 0.1}s;">
+                    <div class="detection-rank"><div class="dot"></div> ${ranks[i]}</div>
+                    <div class="detection-header">
+                        <span class="detection-name ${isTop ? '' : 'sm'}">${pred.display_name}</span>
+                        <span class="confidence-badge ${getBadgeClass(pred.confidence)}">${pred.confidence.toFixed(1)}%</span>
+                    </div>
+                    <div class="confidence-track">
+                        <div class="confidence-fill ${getFillClass(pred.confidence)}" style="width:${pred.confidence}%"></div>
+                    </div>
+                    <div class="serving-info">Per ${pn.serving_size}</div>
+                    <div class="mini-nutrition">
+                        <div class="mini-nut"><div class="mini-nut-label">Cal</div><div class="mini-nut-val">${pn.calories}</div></div>
+                        <div class="mini-nut"><div class="mini-nut-label">Protein</div><div class="mini-nut-val">${pn.protein}g</div></div>
+                        <div class="mini-nut"><div class="mini-nut-label">Fat</div><div class="mini-nut-val">${pn.fat}g</div></div>
+                        <div class="mini-nut"><div class="mini-nut-label">Carbs</div><div class="mini-nut-val">${pn.carbs}g</div></div>
+                        <div class="mini-nut"><div class="mini-nut-label">Fiber</div><div class="mini-nut-val">${pn.fiber}g</div></div>
+                    </div>
+                </div>`;
+            });
+
+            placeholderState.querySelectorAll('.detection-card').forEach(c => c.style.display = 'none');
+            placeholderState.querySelector('.empty-state').style.display = 'none';
+
+            resultsState.innerHTML = html;
+            resultsState.classList.add('show');
+            newAnalysisBtn.style.display = 'inline';
+
+            // ── Meal suggestions ──
+            renderSuggestions(n.calories);
+
+            // ── Update daily intake ──
+            updateDailyIntake(n);
+
+            // ── Show Grad-CAM button ──
+            document.getElementById('gradcamBtn').style.display = 'inline-block';
+
+            // ── Fetch Grad-CAM in background ──
+            if (currentFile) fetchGradCAM();
+        }
+
+        // (Pie chart removed — nutrition grid already shows the breakdown)
+
+        // ── Meal Suggestions ──
+        function renderSuggestions(currentCal) {
+            const lower = healthyAlts.filter(a => a.cal < currentCal).sort(() => Math.random() - 0.5).slice(0, 5);
+            if (!lower.length) return;
+            const chips = document.getElementById('suggestionChips');
+            chips.innerHTML = lower.map(a => `
+                <span class="suggestion-chip">${a.name} <span class="s-cal">${a.cal} kcal</span></span>
+            `).join('');
+            document.getElementById('suggestionsSection').classList.add('show');
+        }
+
+        // ── Daily Intake Tracker ──
+        const dailyGoals = { cal: 2000, protein: 50, fat: 65, carbs: 300, fiber: 25 };
+
+        function getTodayKey() { return 'nutrisnap_intake_' + new Date().toISOString().slice(0, 10); }
+
+        function getDailyIntake() {
+            try { return JSON.parse(localStorage.getItem(getTodayKey()) || '{"cal":0,"protein":0,"fat":0,"carbs":0,"fiber":0}'); }
+            catch { return { cal: 0, protein: 0, fat: 0, carbs: 0, fiber: 0 }; }
+        }
+
+        function updateDailyIntake(n) {
+            const intake = getDailyIntake();
+            intake.cal += n.calories;
+            intake.protein += n.protein;
+            intake.fat += n.fat;
+            intake.carbs += n.carbs;
+            intake.fiber += n.fiber;
+            localStorage.setItem(getTodayKey(), JSON.stringify(intake));
+            renderDailyIntake();
+        }
+
+        function renderDailyIntake() {
+            const intake = getDailyIntake();
+            document.getElementById('intakeDate').textContent = new Date().toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+
+            const items = [
+                { id: 'Cal', key: 'cal', goal: dailyGoals.cal, unit: '' },
+                { id: 'Pro', key: 'protein', goal: dailyGoals.protein, unit: 'g' },
+                { id: 'Fat', key: 'fat', goal: dailyGoals.fat, unit: 'g' },
+                { id: 'Carb', key: 'carbs', goal: dailyGoals.carbs, unit: 'g' },
+                { id: 'Fib', key: 'fiber', goal: dailyGoals.fiber, unit: 'g' },
+            ];
+            items.forEach(item => {
+                const pct = Math.min((intake[item.key] / item.goal) * 100, 100);
+                document.getElementById('int' + item.id).style.width = pct + '%';
+                document.getElementById('int' + item.id + 'Num').textContent =
+                    `${Math.round(intake[item.key])} / ${item.goal}${item.unit}`;
+            });
+        }
+
+        renderDailyIntake();
+
+        // ── Grad-CAM ──
+        let gradcamVisible = false;
+        const gradcamBtn = document.getElementById('gradcamBtn');
+        const gradcamWrap = document.getElementById('gradcamWrap');
+        const gradcamImg = document.getElementById('gradcamImg');
+        const previewImgWrap = document.getElementById('previewImgWrap');
+
+        gradcamBtn.addEventListener('click', () => {
+            gradcamVisible = !gradcamVisible;
+            if (gradcamVisible) {
+                gradcamWrap.classList.add('show');
+                previewImgWrap.style.display = 'none';
+                gradcamBtn.textContent = 'Original';
+            } else {
+                gradcamWrap.classList.remove('show');
+                previewImgWrap.style.display = '';
+                gradcamBtn.textContent = 'Heatmap';
+            }
+        });
+
+        async function fetchGradCAM() {
+            if (!currentFile) return;
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            try {
+                const res = await fetch('/gradcam', { method: 'POST', body: fd });
+                const data = await res.json();
+                if (data.gradcam) {
+                    gradcamImg.src = data.gradcam;
+                }
+            } catch { /* silently fail if endpoint not ready */ }
+        }
+
+        // ── Reset ──
+        newAnalysisBtn.addEventListener('click', resetAll);
+
+        function resetAll() {
+            resultsState.classList.remove('show');
+            resultsState.innerHTML = '';
+            placeholderState.querySelectorAll('.detection-card').forEach(c => c.style.display = '');
+            const es = placeholderState.querySelector('.empty-state');
+            if (es) es.style.display = '';
+
+            // Reset placeholder values
+            ['ph-cal','ph-protein','ph-fat','ph-carbs','ph-fiber','ph-serving'].forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.remove('filled');
+                if (id === 'ph-cal') el.innerHTML = '---<span class="npc-unit"> kcal</span>';
+                else if (id === 'ph-serving') el.innerHTML = '---';
+                else el.innerHTML = '---<span class="npc-unit"> g</span>';
+            });
+
+            uploadDefault.classList.remove('hidden');
+            previewArea.classList.remove('show');
+            newAnalysisBtn.style.display = 'none';
+            currentFile = null;
+            fileInput.value = '';
+
+            // Reset extras
+            document.getElementById('foodNameBanner').style.display = 'none';
+            document.getElementById('suggestionsSection').classList.remove('show');
+            gradcamWrap.classList.remove('show');
+            previewImgWrap.style.display = '';
+            gradcamBtn.style.display = 'none';
+            gradcamBtn.textContent = 'Heatmap';
+            gradcamVisible = false;
+        }
+
+        // ── History ──
+        const historyStrip = document.getElementById('historyStrip');
+        const historyRow = document.getElementById('historyRow');
+
+        function getHistory() { try { return JSON.parse(localStorage.getItem('nutrisnap_history') || '[]'); } catch { return []; } }
+
+        function saveHistory(entry) {
+            const h = getHistory();
+            h.unshift(entry);
+            if (h.length > 8) h.pop();
+            localStorage.setItem('nutrisnap_history', JSON.stringify(h));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const h = getHistory();
+            if (!h.length) { historyStrip.classList.remove('show'); return; }
+            historyStrip.classList.add('show');
+            historyRow.innerHTML = h.map((item, i) => `
+                <div class="history-chip" onclick="showHistoryItem(${i})">
+                    <img src="${item.thumb}" alt="${item.name}">
+                    <div class="history-chip-info">
+                        <div class="history-chip-name">${item.name}</div>
+                        <div class="history-chip-cal">${item.calories} kcal</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showHistoryItem(idx) {
+            const h = getHistory();
+            const item = h[idx];
+            if (item && item.predictions) {
+                previewImg.src = item.thumb;
+                previewFilename.textContent = item.name;
+                uploadDefault.classList.add('hidden');
+                previewArea.classList.add('show');
+                renderResults(item.predictions);
+            }
+        }
+
+        function addToHistory(predictions, thumbUrl) {
+            const top = predictions[0];
+            const now = new Date();
+            const time = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) + ', ' + now.toLocaleDateString([], {day:'numeric',month:'short'});
+            saveHistory({ name: top.display_name, confidence: top.confidence.toFixed(1), calories: top.nutrition.calories, thumb: thumbUrl, time, predictions });
+        }
+
+        document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+            localStorage.removeItem('nutrisnap_history');
+            renderHistory();
+        });
+
+        renderHistory();
+    </script>
+</body>
+</html>

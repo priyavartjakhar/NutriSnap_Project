@@ -1,0 +1,294 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{setspace}
+\usepackage{parskip}
+
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue}
+\titleformat{\section}{\normalfont\Large\bfseries}{}{0em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{}{0em}{}
+\setlength{\parindent}{0pt}
+\onehalfspacing
+
+\begin{document}
+
+% ═══════════════════════════════════════════
+% TITLE PAGE
+% ═══════════════════════════════════════════
+
+\begin{titlepage}
+\begin{center}
+
+\includegraphics[width=1.2in]{/tmp/gu_logo.png}
+
+\vspace{0.5cm}
+
+{\Large \textbf{SYNOPSIS}}\\[0.15cm]
+{\Large ON}\\[0.15cm]
+{\Large \textbf{FOOD CALORIE ESTIMATION FROM PHOTOGRAPHS}}
+
+\vspace{0.8cm}
+
+{\normalsize SUBMITTED IN PARTIAL FULFILLMENT OF THE REQUIREMENT\\FOR THE AWARD OF THE DEGREE OF}
+
+\vspace{0.4cm}
+
+{\Large \textbf{BACHELOR OF TECHNOLOGY}}\\[0.15cm]
+{\Large (Computer Science and Engineering --- IoT)}
+
+\vspace{1cm}
+
+\begin{tabular}{p{7cm}p{7cm}}
+\textbf{SUBMITTED TO} & \textbf{SUBMITTED BY} \\[0.2cm]
+Dr. Anu Yadav & Yashika (231031150057)\\
+Guide / Supervisor & Pushpa (231031150040)\\
+ & Atharv (231031150013)\\
+ & B.Tech CSE (IoT), 6th Semester\\
+\end{tabular}
+
+\vspace{1cm}
+
+{\Large JAN --- MAY, 2026}
+
+\vspace{0.8cm}
+
+{\normalsize DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING}\\[0.15cm]
+{\Large \textbf{GURUGRAM UNIVERSITY, GURUGRAM}}
+
+\end{center}
+\end{titlepage}
+
+% ═══════════════════════════════════════════
+% TABLE OF CONTENTS
+% ═══════════════════════════════════════════
+
+\newpage
+\begin{center}
+{\Large \textbf{TABLE OF CONTENTS}}
+\end{center}
+\vspace{0.5cm}
+
+\begin{tabularx}{\textwidth}{Xr}
+\toprule
+ & \textbf{Page} \\
+\midrule
+Abstract & ii \\
+Table of Contents & iii \\
+1. Introduction & 1 \\
+2. Problem Statement & 2 \\
+3. Project Objectives & 3 \\
+4. Design / Methodology & 4 \\
+5. Tools and Technology & 5 \\
+6. Expected Outcome & 6 \\
+References & 7 \\
+\bottomrule
+\end{tabularx}
+
+% ═══════════════════════════════════════════
+% ABSTRACT
+% ═══════════════════════════════════════════
+
+\newpage
+\section{Abstract}
+
+Accurate dietary assessment is essential for managing health conditions such as obesity, diabetes, and cardiovascular disease. Traditional methods of food logging are manual, tedious, and error-prone, leading to poor adherence among users. This project presents a deep-learning-based system that estimates the caloric and nutritional content of a meal from a single photograph. An EfficientNetV2-S convolutional neural network is trained on the Food-101 benchmark dataset comprising 101,000 images across 101 food categories. Transfer learning is employed in a two-phase training strategy: first, a frozen backbone phase for feature adaptation, followed by fine-tuning of the top layers with cosine annealing learning rate scheduling. The classified food item is mapped to the USDA FoodData Central database to retrieve per-serving nutritional information including calories, protein, fat, carbohydrates, and dietary fibre. A Flask-based web application provides an intuitive interface for image upload and camera capture, returning the top-3 predicted food classes alongside a detailed nutritional breakdown. Experimental results demonstrate a Top-1 validation accuracy exceeding 75\% and a Top-5 accuracy above 93\%, confirming the viability of photograph-based calorie estimation as a practical tool for dietary monitoring.
+
+\textbf{Keywords:} Food recognition, calorie estimation, deep learning, EfficientNetV2, transfer learning, nutritional analysis, Food-101, convolutional neural network.
+
+% ═══════════════════════════════════════════
+% 1. INTRODUCTION
+% ═══════════════════════════════════════════
+
+\newpage
+\section{1. INTRODUCTION}
+
+The global burden of diet-related diseases has intensified the need for accessible and automated nutritional assessment tools. According to the World Health Organization, unhealthy diets and physical inactivity are among the leading risk factors for non-communicable diseases worldwide. Manual food logging through mobile applications, while widely adopted, requires users to search extensive databases and estimate portion sizes --- a process that is both time-consuming and subject to significant estimation errors.
+
+Recent advances in computer vision and deep learning have opened new avenues for automating food recognition from photographs. Convolutional neural networks (CNNs), particularly those pre-trained on large-scale image datasets such as ImageNet, have demonstrated remarkable performance in visual recognition tasks through transfer learning. The EfficientNet family of models, introduced by Tan and Le (2019), achieves state-of-the-art accuracy with significantly fewer parameters by employing compound scaling of network depth, width, and resolution.
+
+This project develops an end-to-end system that accepts a food photograph as input, classifies it into one of 101 food categories using an EfficientNetV2-S model, and retrieves the corresponding nutritional information from the USDA FoodData Central database. The system is deployed as a responsive web application built with Flask, enabling real-time dietary analysis through both image upload and live camera capture on any device with a web browser.
+
+% ═══════════════════════════════════════════
+% 2. PROBLEM STATEMENT
+% ═══════════════════════════════════════════
+
+\newpage
+\section{2. PROBLEM STATEMENT}
+
+Despite the proliferation of diet-tracking applications, accurate food identification and calorie estimation remain significant challenges. The core problems addressed by this project are:
+
+\textbf{Manual Logging Fatigue:} Users abandon food diaries within weeks due to the cognitive burden of searching databases, selecting correct entries, and estimating portion sizes.
+
+\textbf{Estimation Inaccuracy:} Studies report that self-reported calorie intake can deviate by 30--50\% from actual consumption, rendering manual logs unreliable for clinical or fitness applications.
+
+\textbf{Limited Accessibility:} Existing image-based solutions often rely on proprietary APIs, cloud-only processing, or require specialised hardware, limiting adoption in resource-constrained settings.
+
+\textbf{Nutritional Data Gap:} Many food recognition systems classify food but do not provide actionable nutritional information, requiring users to perform additional lookups.
+
+\vspace{0.5cm}
+\textbf{Dataset Summary}
+\vspace{0.3cm}
+
+\begin{tabularx}{\textwidth}{lX}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Dataset & Food-101 (ETH Zurich) \\
+Total Images & 101,000 \\
+Number of Classes & 101 \\
+Training Images & 75,750 \\
+Test Images & 25,250 \\
+\bottomrule
+\end{tabularx}
+
+% ═══════════════════════════════════════════
+% 3. PROJECT OBJECTIVES
+% ═══════════════════════════════════════════
+
+\newpage
+\section{3. PROJECT OBJECTIVES}
+
+The primary objectives of this project are:
+
+\begin{enumerate}[leftmargin=1.5cm]
+\item To develop a deep learning model capable of classifying food images into 101 categories with a Top-1 accuracy exceeding 75\% and Top-5 accuracy exceeding 93\%.
+
+\item To implement a two-phase transfer learning strategy using EfficientNetV2-S pre-trained on ImageNet, incorporating frozen backbone training followed by selective fine-tuning.
+
+\item To create a comprehensive nutritional mapping of all 101 food categories using the USDA FoodData Central database, providing per-serving values for calories, protein, fat, carbohydrates, and dietary fibre.
+
+\item To build a responsive Flask-based web application supporting image upload, drag-and-drop, and live camera capture for real-time food recognition and nutritional analysis.
+
+\item To evaluate model performance using standard metrics (Top-1 accuracy, Top-5 accuracy, cross-entropy loss) and validate nutritional estimates against established dietary databases.
+
+\item To design an intuitive user interface that presents classification confidence scores and detailed nutritional breakdowns in a clear, actionable format.
+\end{enumerate}
+
+% ═══════════════════════════════════════════
+% 4. DESIGN / METHODOLOGY
+% ═══════════════════════════════════════════
+
+\newpage
+\section{4. DESIGN / METHODOLOGY}
+
+The proposed system follows a six-stage pipeline:
+
+\textbf{Stage 1 --- Data Acquisition and Preparation}\\
+The Food-101 dataset is downloaded and extracted. Training images undergo data augmentation including random horizontal flips, rotation ($\pm$15\textdegree), colour jitter, and random resized cropping to 224$\times$224 pixels. Test images are centre-cropped and normalised using ImageNet statistics (mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]).
+
+\textbf{Stage 2 --- Model Architecture}\\
+EfficientNetV2-S pre-trained on ImageNet serves as the feature extraction backbone. The original classifier head (1000 classes) is replaced with a custom head comprising a Dropout layer ($p$=0.3) followed by a fully connected layer mapping 1,280 features to 101 food classes.
+
+\textbf{Stage 3 --- Phase 1 Training (Frozen Backbone)}\\
+The backbone weights are frozen and only the classifier head is trained for 5 epochs using the Adam optimiser with a learning rate of $1\times10^{-3}$ and cross-entropy loss. This phase rapidly adapts the classifier to Food-101 categories without disturbing the pre-trained feature representations.
+
+\textbf{Stage 4 --- Phase 2 Training (Fine-Tuning)}\\
+The top 50 layers of the backbone are unfrozen and the entire network is fine-tuned for up to 25 epochs with a reduced learning rate of $1\times10^{-4}$ and cosine annealing scheduling. Early stopping with patience of 5 epochs prevents overfitting.
+
+\textbf{Stage 5 --- Nutritional Mapping}\\
+Each of the 101 food classes is mapped to nutritional data sourced from the USDA FoodData Central database. The mapping includes calories, protein (g), total fat (g), carbohydrates (g), dietary fibre (g), and standard serving size per category.
+
+\textbf{Stage 6 --- Web Application Deployment}\\
+A Flask web server loads the trained model and exposes a \texttt{/predict} API endpoint. The frontend supports drag-and-drop image upload, file selection, and camera capture. Upon submission, the server returns the top-3 predictions with confidence scores and corresponding nutritional information displayed in an interactive dashboard.
+
+% ═══════════════════════════════════════════
+% 5. TOOLS AND TECHNOLOGY
+% ═══════════════════════════════════════════
+
+\newpage
+\section{5. TOOLS AND TECHNOLOGY}
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Component} & \textbf{Technology} & \textbf{Purpose} \\
+\midrule
+Programming Language & Python 3.9+ & Core development language \\
+\rowcolor{gray!10}
+Deep Learning Framework & PyTorch 2.x & Model training and inference \\
+Pre-trained Model & EfficientNetV2-S & Feature extraction backbone \\
+\rowcolor{gray!10}
+Dataset & Food-101 & 101K images, 101 food classes \\
+Nutritional Database & USDA FoodData Central & Calorie and macronutrient data \\
+\rowcolor{gray!10}
+Web Framework & Flask & REST API and server-side rendering \\
+Frontend & HTML5, CSS3, JS & Responsive user interface \\
+\rowcolor{gray!10}
+Image Processing & Pillow, torchvision & Image transforms and augmentation \\
+Hardware & Apple M1 Max (MPS) & GPU-accelerated training \\
+\bottomrule
+\end{tabularx}
+
+% ═══════════════════════════════════════════
+% 6. EXPECTED OUTCOME
+% ═══════════════════════════════════════════
+
+\newpage
+\section{6. EXPECTED OUTCOME}
+
+\begin{enumerate}[leftmargin=1.5cm]
+\item A trained EfficientNetV2-S model achieving $>$75\% Top-1 accuracy and $>$93\% Top-5 accuracy on the Food-101 test set, demonstrating reliable food classification performance.
+
+\item A comprehensive nutritional database mapping all 101 food categories to USDA-sourced per-serving values (calories, protein, fat, carbohydrates, fibre), enabling immediate dietary feedback upon classification.
+
+\item A fully functional web application (NutriSnap) that processes food photographs in under 3 seconds and presents the top-3 predictions with confidence scores alongside a detailed nutritional breakdown.
+
+\item Validation that two-phase transfer learning (frozen backbone followed by selective fine-tuning with cosine annealing) provides superior convergence compared to single-phase training approaches on the Food-101 benchmark.
+
+\item A responsive, device-agnostic user interface supporting drag-and-drop upload, file selection, and live camera capture, ensuring accessibility across desktops, tablets, and smartphones.
+\end{enumerate}
+
+\vspace{0.5cm}
+\textbf{Project Timeline}
+\vspace{0.3cm}
+
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Phase} & \textbf{Duration} & \textbf{Activities} \\
+\midrule
+Phase 1 & Jan 2026 & Literature review, dataset selection \\
+\rowcolor{gray!10}
+Phase 2 & Feb 2026 & Data preparation, model architecture design \\
+Phase 3 & Feb--Mar 2026 & Model training and hyperparameter tuning \\
+\rowcolor{gray!10}
+Phase 4 & Mar 2026 & Web application development and integration \\
+Phase 5 & Apr 2026 & Testing, evaluation, and optimisation \\
+\rowcolor{gray!10}
+Phase 6 & May 2026 & Documentation, synopsis, and final presentation \\
+\bottomrule
+\end{tabularx}
+
+% ═══════════════════════════════════════════
+% REFERENCES
+% ═══════════════════════════════════════════
+
+\newpage
+\section{REFERENCES}
+
+\begin{enumerate}[label={[\arabic*]}, leftmargin=1cm]
+\item L. Bossard, M. Guillaumin, and L. Van Gool, ``Food-101 --- Mining discriminative components with random forests,'' \textit{European Conference on Computer Vision (ECCV)}, Zurich, Switzerland, 2014, pp. 446--461.
+
+\item M. Tan and Q. V. Le, ``EfficientNetV2: Smaller models and faster training,'' \textit{International Conference on Machine Learning (ICML)}, Virtual, 2021, pp. 10096--10106.
+
+\item J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, ``ImageNet: A large-scale hierarchical image database,'' \textit{IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}, Miami, FL, USA, 2009, pp. 248--255.
+
+\item U.S. Department of Agriculture, ``FoodData Central,'' [Online]. Available: \url{https://fdc.nal.usda.gov/}
+
+\item A. Meyers \textit{et al.}, ``Im2Calories: Towards an automated mobile vision food diary,'' \textit{IEEE International Conference on Computer Vision (ICCV)}, Santiago, Chile, 2015, pp. 1233--1241.
+
+\item K. He, X. Zhang, S. Ren, and J. Sun, ``Deep residual learning for image recognition,'' \textit{IEEE CVPR}, Las Vegas, NV, USA, 2016, pp. 770--778.
+
+\item C. Szegedy, V. Vanhoucke, S. Ioffe, J. Shlens, and Z. Wojna, ``Rethinking the inception architecture for computer vision,'' \textit{IEEE CVPR}, Las Vegas, NV, USA, 2016, pp. 2818--2826.
+
+\item A. Paszke \textit{et al.}, ``PyTorch: An imperative style, high-performance deep learning library,'' \textit{Advances in Neural Information Processing Systems (NeurIPS)}, vol. 32, 2019, pp. 8024--8035.
+\end{enumerate}
+
+\end{document}

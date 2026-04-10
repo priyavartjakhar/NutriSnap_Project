@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriSnap - Training Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #ffffff;
+            color: #1a1a1a;
+            min-height: 100vh;
+        }
+        .navbar {
+            background: #1A6B4E;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar h1 {
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+        .navbar a {
+            color: #d4f0e4;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .navbar a:hover { color: #fff; }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 36px;
+        }
+        .stat-card {
+            background: #f7faf9;
+            border: 1px solid #e0ebe6;
+            border-radius: 12px;
+            padding: 20px 24px;
+            text-align: center;
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #6b7c74;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+        .stat-card .value {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #1A6B4E;
+        }
+        .chart-section {
+            background: #f7faf9;
+            border: 1px solid #e0ebe6;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-section h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 16px;
+        }
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-height: 380px;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px 0;
+            color: #6b7c74;
+            font-size: 1rem;
+        }
+        .error-msg {
+            text-align: center;
+            padding: 40px;
+            color: #b94a48;
+            background: #fdf2f2;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>NutriSnap Training Dashboard</h1>
+        <a href="/">Back to App</a>
+    </nav>
+
+    <div class="container">
+        <div id="loading" class="loading">Loading training history...</div>
+        <div id="error" class="error-msg" style="display:none;"></div>
+
+        <div id="content" style="display:none;">
+            <div class="stats-grid" id="stats-grid"></div>
+
+            <div class="chart-section">
+                <h2>Loss Curves</h2>
+                <div class="chart-wrapper">
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2>Accuracy Curves</h2>
+                <div class="chart-wrapper">
+                    <canvas id="accChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <h2>Learning Rate Schedule (Phase 2)</h2>
+                <div class="chart-wrapper">
+                    <canvas id="lrChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+const GREEN      = '#1A6B4E';
+const GREEN_LIGHT = '#3da87a';
+const ORANGE     = '#e08a3c';
+const BLUE       = '#3b82f6';
+const PURPLE     = '#8b5cf6';
+
+function makeStat(label, value) {
+    return `<div class="stat-card"><div class="label">${label}</div><div class="value">${value}</div></div>`;
+}
+
+function chartOpts(yTitle) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+            legend: { position: 'top', labels: { font: { family: 'Inter', size: 12 }, usePointStyle: true, pointStyle: 'circle' } },
+            tooltip: { backgroundColor: '#1a1a1a', titleFont: { family: 'Inter' }, bodyFont: { family: 'Inter' } }
+        },
+        scales: {
+            x: { title: { display: true, text: 'Epoch', font: { family: 'Inter', weight: '500' } }, grid: { color: '#e0ebe6' } },
+            y: { title: { display: true, text: yTitle, font: { family: 'Inter', weight: '500' } }, grid: { color: '#e0ebe6' } }
+        }
+    };
+}
+
+function ds(label, data, color, dashed) {
+    return {
+        label, data,
+        borderColor: color,
+        backgroundColor: color + '18',
+        borderWidth: 2,
+        pointRadius: 2,
+        pointHoverRadius: 5,
+        tension: 0.3,
+        borderDash: dashed ? [6, 3] : []
+    };
+}
+
+async function init() {
+    const loadEl = document.getElementById('loading');
+    const errEl  = document.getElementById('error');
+    const contentEl = document.getElementById('content');
+
+    try {
+        const res = await fetch('/training');
+        if (!res.ok) throw new Error('Training history not available.');
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        const p1 = data.phase1 || [];
+        const p2 = data.phase2 || [];
+        const all = [...p1, ...p2];
+
+        // Compute continuous epoch labels
+        const p1Len = p1.length;
+        const epochs = all.map((_, i) => i + 1);
+
+        // Summary stats
+        const bestTop1 = Math.max(...all.map(e => e.val_top1 || 0));
+        const bestValLoss = Math.min(...all.map(e => e.val_loss));
+        const totalEpochs = all.length;
+        const totalTime = all.reduce((s, e) => s + (e.time || 0), 0);
+        const timeMins = (totalTime / 60).toFixed(1);
+
+        const statsHtml =
+            makeStat('Best Val Top-1', bestTop1.toFixed(2) + '%') +
+            makeStat('Total Epochs', totalEpochs) +
+            makeStat('Best Val Loss', bestValLoss.toFixed(4)) +
+            makeStat('Training Time', timeMins + ' min');
+        document.getElementById('stats-grid').innerHTML = statsHtml;
+
+        // Loss chart
+        new Chart(document.getElementById('lossChart'), {
+            type: 'line',
+            data: {
+                labels: epochs,
+                datasets: [
+                    ds('Train Loss', all.map(e => e.train_loss), GREEN, false),
+                    ds('Val Loss',   all.map(e => e.val_loss),   ORANGE, true)
+                ]
+            },
+            options: chartOpts('Loss')
+        });
+
+        // Accuracy chart
+        new Chart(document.getElementById('accChart'), {
+            type: 'line',
+            data: {
+                labels: epochs,
+                datasets: [
+                    ds('Val Top-1', all.map(e => e.val_top1), GREEN, false),
+                    ds('Val Top-5', all.map(e => e.val_top5), BLUE, false),
+                    ds('Train Top-1', all.map(e => e.train_top1), GREEN_LIGHT, true),
+                    ds('Train Top-5', all.map(e => e.train_top5), PURPLE, true)
+                ]
+            },
+            options: chartOpts('Accuracy (%)')
+        });
+
+        // LR chart (phase 2 only)
+        const p2Epochs = p2.map((_, i) => p1Len + i + 1);
+        new Chart(document.getElementById('lrChart'), {
+            type: 'line',
+            data: {
+                labels: p2Epochs,
+                datasets: [ds('Learning Rate', p2.map(e => e.lr), GREEN, false)]
+            },
+            options: chartOpts('Learning Rate')
+        });
+
+        loadEl.style.display = 'none';
+        contentEl.style.display = 'block';
+
+    } catch (err) {
+        loadEl.style.display = 'none';
+        errEl.textContent = err.message;
+        errEl.style.display = 'block';
+    }
+}
+
+init();
+</script>
+</body>
+</html>
